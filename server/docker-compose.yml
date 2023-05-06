@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  server:
+    container_name: api_server
+    build:
+      context: .
+      dockerfile: ./docker/go/Dockerfile
+    tty: true
+    environment:
+      SERVER_PORT: 8000
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - .:/go/src/tonkatsu
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+  db:
+    container_name: ${DB_HOST}
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./db/sql:/docker-entrypoint-initdb.d
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/data:/var/lib/mysql
+    ports:
+      - 3306:3306
