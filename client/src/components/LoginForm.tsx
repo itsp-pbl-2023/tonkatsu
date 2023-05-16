@@ -29,6 +29,22 @@ export const LoginForm: FC<Props> = props => {
   const onSubmit: SubmitHandler<Account> = (data) => {
     console.log(data.username);
     console.log(data.password);
+    const hash = "hash";
+    // const hash = TODO: HASH
+    const Http = new XMLHttpRequest();
+    let url;
+    if (props.isLogin) {
+      url='http://localhost:8000/login';
+    } else {
+      url='http://localhost:8000/account';
+    }
+    Http.open('POST', url);
+    Http.send(`userID=${data.username}&password=${hash}`);
+
+    Http.onreadystatechange = (e) => {
+      console.log(Http.responseText)
+    }
+
     if (data.username === "user" && data.password === "password") {
       loginSuccess();
     } else {
