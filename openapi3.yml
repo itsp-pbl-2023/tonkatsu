@@ -1,12 +1,29 @@
-openapi: '3.0.2'
+openapi: '3.1.0'
 info:
   title: API Title
   version: '1.0'
 servers:
   - url: https://api.server.test/v1
 paths:
-  /test:
-    get:
+  /account:
+    post:
+      parameters: 
+        - name: userID
+          schema:
+            type: string
+        - name: password
       responses:
         '200':
           description: OK
+        '400':
+          description: "重複"
+  /login:
+    post:
+      parameters:
+        - name: userID
+        - name: password
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: NG
