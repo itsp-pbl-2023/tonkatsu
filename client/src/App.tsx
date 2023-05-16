@@ -1,8 +1,8 @@
-import { useState } from 'react'
+// import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./Home";
-import Account from "./Account";
-import Login from "./Login";
+import Home from "./views/Home";
+import Account from "./views/Account";
+import Login from "./views/Login";
 // import './App.css'
 
 const App = () => {

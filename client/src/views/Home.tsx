@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 
-const Login = () => {
+const Home = () => {
   return (
     <>
-      <h1>ログインページ</h1>
+      <h1>ホーム</h1>
       <div>
         新規登録は<Link to={`/account/`}>こちら</Link>
       </div>
       <div>
-        <Link to={`/`}>ホームに戻る</Link>
+        ログインは<Link to={`/Login/`}>こちら</Link>
       </div>
     </>
   );
 };
 
-export default Login;
+export default Home;
