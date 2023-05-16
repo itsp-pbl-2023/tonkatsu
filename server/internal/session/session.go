@@ -25,7 +25,7 @@ const (
 	sCookieName = "session"
 )
 
-// CreateSession はセッションのためのCookieを生成する.
+// CreateSession はユーザIDをもとにセッションのためのCookieを生成する.
 func CreateSesison(ctx *gin.Context, id int64) error {
 	sUUID, err := uuid.NewRandom()
 	if err != nil {
