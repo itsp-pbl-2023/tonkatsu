@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func AddAccount(userName, password string) error {
+func AddAccount(userName, password string) (int64, error) {
 	var exists int8
 	err := db.Select(
 		&exists, 
@@ -17,11 +17,11 @@ func AddAccount(userName, password string) error {
 		userName,
 	)
 	if err != nil {
-		return nil
+		return 0, nil
 	}
 
 	if exists == 1 {
-		return fmt.Errorf("User name %s is already used.", userName)
+		return 0, fmt.Errorf("User name %s is already used.", userName)
 	}
 
 	hashedPassBytes := sha256.Sum256([]byte(password))
@@ -32,8 +32,10 @@ func AddAccount(userName, password string) error {
 		hashedPassword,
 	)
 
-	_ = res
-	// user_id := res.LastInsertId()
+	user_id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	return user_id, err
 }
