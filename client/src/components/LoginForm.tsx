@@ -7,8 +7,8 @@ type Props = {
   isLogin: boolean;
 }
 
-type Account = {
-  username: string;
+type AccountData = {
+  userName: string;
   password: string;
 };
 
@@ -22,30 +22,36 @@ export const LoginForm: FC<Props> = props => {
     handleSubmit,
     reset,
     formState: { errors }
-  } = useForm<Account>({
+  } = useForm<AccountData>({
     mode: 'onChange',
   });
 
-  const onSubmit: SubmitHandler<Account> = (data) => {
-    console.log(data.username);
+  const onSubmit: SubmitHandler<AccountData> = (data) => {
+    console.log(data.userName);
     console.log(data.password);
     const hash = "hash";
     // const hash = TODO: HASH
     const Http = new XMLHttpRequest();
     let url;
     if (props.isLogin) {
-      url='http://localhost:8000/login';
+      url = 'http://localhost:8000/login';
     } else {
-      url='http://localhost:8000/account';
+      url = 'http://localhost:8000/account';
     }
     Http.open('POST', url);
-    Http.send(`userID=${data.username}&password=${hash}`);
+    const sendData: AccountData = {
+        userName: data.userName,
+        password: hash
+    }
+    let loginInfo = JSON.stringify(sendData);
+    console.log(loginInfo);
+    Http.send(loginInfo);
 
     Http.onreadystatechange = (e) => {
       console.log(Http.responseText)
     }
 
-    if (data.username === "user" && data.password === "password") {
+    if (data.userName === "user" && data.password === "password") {
       loginSuccess();
     } else {
       loginErrorMsg();
@@ -79,7 +85,7 @@ export const LoginForm: FC<Props> = props => {
                 id = "userID"
                 type="text"
                 placeholder = "userID"
-                {...register('username', { 
+                {...register('userName', { 
                   required: 'ユーザーIDを入力してください。', 
                   maxLength: {
                       value: 20,
@@ -93,7 +99,7 @@ export const LoginForm: FC<Props> = props => {
                 })}
               />
             </div>
-            <ErrorMessage errors={errors} name="username" render={({message}) => <span>{message}</span>} />
+            <ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
             <div>
               <label htmlFor="password">password</label>
               <hr />
