@@ -76,12 +76,9 @@ export const LoginForm: FC<Props> = props => {
             ? <h1>ログイン</h1>
             : <h1>新規登録</h1>
           }
-          <hr />
           <div>
             <p>{errorMsg}</p>
-            <div>
-              <label htmlFor="userID">userID</label>
-              <hr />
+						<div>
               <input 
                 id = "userID"
                 type="text"
@@ -100,10 +97,10 @@ export const LoginForm: FC<Props> = props => {
                 })}
               />
             </div>
-            <ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
-            <div>
-              <label htmlFor="password">password</label>
-              <hr />
+						<div>
+            	<ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
+						</div>
+						<div>
               <input
                 id = "password"
                 type = "password"
@@ -123,7 +120,9 @@ export const LoginForm: FC<Props> = props => {
                 })} 
               />
             </div>
-            <ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
+						<div>
+            	<ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
+						</div>
             <button
               type = "submit"
               >{props.isLogin ? "ログイン" : "新規登録"}</button>
