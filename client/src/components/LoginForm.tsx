@@ -72,8 +72,8 @@ export const LoginForm: FC<Props> = props => {
       <div>
         <form action={props.isLogin ? "/" : "/account"} method="GET" onSubmit={handleSubmit(onSubmit)}>
           {props.isLogin
-            ? <h1>login</h1>
-            : <h1>register</h1>
+            ? <h1>ログイン</h1>
+            : <h1>新規登録</h1>
           }
           <hr />
           <div>
@@ -125,7 +125,7 @@ export const LoginForm: FC<Props> = props => {
             <ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
             <button
               type = "submit"
-              >login</button>
+              >{props.isLogin ? "ログイン" : "新規登録"}</button>
           </div>
         </form>
         {props.isLogin
