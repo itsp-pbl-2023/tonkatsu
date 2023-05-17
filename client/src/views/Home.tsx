@@ -1,14 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleClickLogin = () => {
+    navigate("/login");
+  };
+
+  const handleClickRegister = () => {
+    navigate("/account");
+  };
+
   return (
     <>
       <h1>ホーム</h1>
       <div>
-        新規登録は<Link to={`/account/`}>こちら</Link>
+        <button onClick={handleClickLogin}>ログイン</button>
       </div>
       <div>
-        ログインは<Link to={`/Login/`}>こちら</Link>
+        <button onClick={handleClickRegister}>新規登録</button>
       </div>
     </>
   );
