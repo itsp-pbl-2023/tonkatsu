@@ -31,31 +31,32 @@ export const LoginForm: FC<Props> = props => {
     console.log(data.password);
     const hash = "hash";
     // const hash = TODO: HASH
-    const Http = new XMLHttpRequest();
+    const xmlHttpRequest = new XMLHttpRequest();
     let url;
     if (props.isLogin) {
       url = 'http://localhost:8000/login';
     } else {
       url = 'http://localhost:8000/account';
     }
-    Http.open('POST', url);
+    xmlHttpRequest.open('POST', url);
     const sendData: AccountData = {
         userName: data.userName,
         password: hash
     }
     let loginInfo = JSON.stringify(sendData);
     console.log(loginInfo);
-    Http.send(loginInfo);
+    xmlHttpRequest.send(loginInfo);
 
-    Http.onreadystatechange = (e) => {
-      console.log(Http.responseText)
+    xmlHttpRequest.onreadystatechange = () => {
+			if (xmlHttpRequest.readyState == 4) {
+				if (xmlHttpRequest.status == 200) {
+					loginSuccess();
+				} else { // if (xmlHttpRequest.status == 401) {
+					loginErrorMsg();
+				}
+			}
     }
 
-    if (data.userName === "user" && data.password === "password") {
-      loginSuccess();
-    } else {
-      loginErrorMsg();
-    }
     reset();
   }
 
