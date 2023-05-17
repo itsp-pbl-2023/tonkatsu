@@ -7,11 +7,20 @@ servers:
 paths:
   /account:
     post:
-      parameters: 
-        - name: userID
-          schema:
-            type: string
-        - name: password
+      requestBody:
+        description: アカウント情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                password:
+                  type: string
+              example:
+                userName: ton
+                password: katsu
       responses:
         '200':
           description: OK
@@ -19,9 +28,20 @@ paths:
           description: "重複"
   /login:
     post:
-      parameters:
-        - name: userID
-        - name: password
+      requestBody:
+        description: 認証情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                password:
+                  type: string
+              example:
+                userName: ton
+                password: katsu
       responses:
         '200':
           description: OK
