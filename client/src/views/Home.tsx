@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { LoginedHome } from "../components/LoginedHome";
+import { NotLoginedHome } from "../components/NotLoginedHome";
 
 const Home = () => {
   const navigate = useNavigate();
