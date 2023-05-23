@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 type Props = {
   isLogin: boolean;
@@ -70,18 +71,14 @@ export const LoginForm: FC<Props> = props => {
 
   return (
     <>
-      <div>
+      <StyledForm>
         <form action={props.isLogin ? "/" : "/account"} method="GET" onSubmit={handleSubmit(onSubmit)}>
-          {props.isLogin
-            ? <h1>ログイン</h1>
-            : <h1>新規登録</h1>
-          }
           <div>
             <p>{errorMsg}</p>
 						<div>
-              <input 
+              <StyledInput 
                 id = "userID"
-                type="text"
+                type = "text"
                 placeholder = "userID"
                 {...register('userName', { 
                   required: 'ユーザーIDを入力してください。', 
@@ -97,11 +94,11 @@ export const LoginForm: FC<Props> = props => {
                 })}
               />
             </div>
+						<StyledErrorMessage>
+              <ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
+            </StyledErrorMessage>
 						<div>
-            	<ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
-						</div>
-						<div>
-              <input
+              <StyledInput
                 id = "password"
                 type = "password"
                 placeholder = "password"
@@ -120,21 +117,74 @@ export const LoginForm: FC<Props> = props => {
                 })} 
               />
             </div>
-						<div>
+						<StyledErrorMessage>
             	<ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
-						</div>
-            <button
+            </StyledErrorMessage>
+            <StyledButton
               type = "submit"
-              >{props.isLogin ? "ログイン" : "新規登録"}</button>
+              >{props.isLogin ? "ログイン" : "新規登録"}</StyledButton>
           </div>
         </form>
         {props.isLogin
-            ? <div>新規登録は<Link to={`/account/`}>こちら</Link></div>
-            : <div>ログインは<Link to={`/Login/`}>こちら</Link></div>
+            ? <StyledMessage>新規登録は<Link to={`/account/`}>こちら</Link></StyledMessage>
+            : <StyledMessage>ログインは<Link to={`/Login/`}>こちら</Link></StyledMessage>
         }
-      </div>
+      </StyledForm>
     </>
   );
 };
 
 export default LoginForm;
+
+const StyledForm = styled.div`
+  border-radius: 20px;
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  width: 360px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+`;
+
+const StyledInput = styled.input`
+  border-radius: 100px;
+  border: 1px solid #535bf2;
+  padding: 8px 16px;
+  margin: 10px;
+  width: 80%;
+  height: 20px;
+  font-size: 1em;
+`;
+
+const StyledButton = styled.button`
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  margin: 1em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  width: 88%;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: border-color 0.25s;
+&:hover {
+  border-color: #646cff;
+}
+&:focus,
+&:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+`;
+
+const StyledMessage = styled.p`
+  margin: 15px 0 0;
+  color: #b3b3b3;
+`;
+
+const StyledErrorMessage = styled.div`
+  color: red;
+  font-size: 14px;
+`;
