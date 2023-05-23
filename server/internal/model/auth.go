@@ -17,7 +17,7 @@ func AddAccount(userName, password string) (int64, error) {
 		userName,
 	)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	if exists == 1 {
