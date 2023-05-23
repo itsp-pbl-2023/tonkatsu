@@ -7,7 +7,7 @@ import (
 )
 
 func AddAccount(userName, password string) (int64, error) {
-	var exists int8
+	var exists[] int8
 	err := db.Select(
 		&exists, 
 		`SELECT EXISTS (
@@ -20,7 +20,7 @@ func AddAccount(userName, password string) (int64, error) {
 		return 0, err
 	}
 
-	if exists == 1 {
+	if exists[0] == 1 {
 		return 0, fmt.Errorf("User name %s is already used.", userName)
 	}
 

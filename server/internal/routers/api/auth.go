@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"tonkatsu-server/internal/model"
 	"tonkatsu-server/internal/session"
 
@@ -23,7 +25,9 @@ func Account(ctx *gin.Context) {
 
 	userID, err := model.AddAccount(auth.UserName, auth.Password)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		ctx.Status(http.StatusBadRequest)
+		return
 	}
 
 	session.CreateSesison(ctx, userID)
