@@ -141,7 +141,7 @@ const StyledForm = styled.div`
   position: relative;
   z-index: 1;
   background: #FFFFFF;
-  width: 360px;
+  max-width: 360px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
@@ -166,7 +166,7 @@ const StyledButton = styled.button`
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  width: 88%;
+  width: 330px;
   background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
