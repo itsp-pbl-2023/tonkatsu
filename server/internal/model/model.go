@@ -24,7 +24,6 @@ func Setup() {
 	db, err = sqlx.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("module.Setup err: %v", err)
-		panic(1)
 	}
 }
 
