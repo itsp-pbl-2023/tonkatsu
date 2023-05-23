@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"tonkatsu-server/internal/model"
 	"tonkatsu-server/internal/routers"
 )
 
@@ -17,6 +18,6 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Invalid port: %s", port_str)
 	}
-
+	model.Setup()
 	router.Run(fmt.Sprintf(":%d", port))
 }
