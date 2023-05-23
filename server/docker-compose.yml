@@ -31,7 +31,12 @@ services:
     volumes:
       - ./db/sql:/docker-entrypoint-initdb.d
       - ./db/conf.d:/etc/mysql/conf.d
-      - ./db/data:/var/lib/mysql
+      - type: volume
+        source: db-data
+        target: /var/lib/mysql
     user: 1000:1000
     ports:
       - 3306:3306
+
+volumes:
+  db-data:
