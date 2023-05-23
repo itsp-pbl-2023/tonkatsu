@@ -30,8 +30,6 @@ export const LoginForm: FC<Props> = props => {
   const onSubmit: SubmitHandler<AccountData> = (data) => {
     console.log(data.userName);
     console.log(data.password);
-    const hash = "hash";
-    // const hash = TODO: HASH
     const xmlHttpRequest = new XMLHttpRequest();
     let url;
     if (props.isLogin) {
@@ -40,20 +38,15 @@ export const LoginForm: FC<Props> = props => {
       url = 'http://localhost:8000/account';
     }
     xmlHttpRequest.open('POST', url);
-    const sendData: AccountData = {
-        userName: data.userName,
-        password: hash
-    }
-    let loginInfo = JSON.stringify(sendData);
-    console.log(loginInfo);
-    xmlHttpRequest.send(loginInfo);
+    let jsonData = JSON.stringify(data);
+    xmlHttpRequest.send(jsonData);
 
     xmlHttpRequest.onreadystatechange = () => {
 			if (xmlHttpRequest.readyState == 4) {
 				if (xmlHttpRequest.status == 200) {
-					loginSuccess();
+						loginSuccess();
 				} else { // if (xmlHttpRequest.status == 401) {
-					loginErrorMsg();
+						loginErrorMsg();
 				}
 			}
     }
