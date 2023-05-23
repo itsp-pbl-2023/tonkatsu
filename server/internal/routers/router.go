@@ -30,6 +30,7 @@ func InitRouter() *gin.Engine {
 
 	r.GET("/hello_world", api.GetHelloWorld)
 	r.POST("/account", api.Account)
+	r.POST("/login", api.Login)
 
 	return r
 }

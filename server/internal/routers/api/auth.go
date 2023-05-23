@@ -11,7 +11,7 @@ import (
 )
 
 type Auth struct {
-	UserName       string `json:"userName"`
+	UserName string `json:"userName"`
 	Password string `json:"password"`
 }
 
@@ -24,6 +24,26 @@ func Account(ctx *gin.Context) {
 	}
 
 	userID, err := model.AddAccount(auth.UserName, auth.Password)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
+	session.CreateSesison(ctx, userID)
+
+	ctx.Status(http.StatusOK)
+}
+
+// ログイン
+func Login(ctx *gin.Context) {
+	var auth Auth
+	err := ctx.BindJSON(&auth)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+	}
+
+	userID, err := model.Login(auth.UserName, auth.Password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		ctx.Status(http.StatusBadRequest)

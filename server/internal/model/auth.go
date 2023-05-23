@@ -7,9 +7,9 @@ import (
 )
 
 func AddAccount(userName, password string) (int64, error) {
-	var exists[] int8
+	var exists []int8
 	err := db.Select(
-		&exists, 
+		&exists,
 		`SELECT EXISTS (
 			SELECT * FROM users
 			WHERE user_name=?
@@ -33,6 +33,41 @@ func AddAccount(userName, password string) (int64, error) {
 	)
 
 	user_id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return user_id, err
+}
+
+func Login(userName, password string) (int64, error) {
+	var exists []int8
+	err := db.Select(
+		&exists,
+		`SELECT EXISTS (
+			SELECT * FROM users
+			WHERE user_name=?
+		)`,
+		userName,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	if exists[0] == 0 {
+		return 0, fmt.Errorf("User name %s is not found.", userName)
+	}
+
+	hashedPassBytes := sha256.Sum256([]byte(password))
+	hashedPassword := hex.EncodeToString(hashedPassBytes[:])
+	var user_id int64
+	err = db.Get(
+		&user_id,
+		`SELECT user_id FROM users
+		WHERE user_name=? AND user_password=?`,
+		userName,
+		hashedPassword,
+	)
 	if err != nil {
 		return 0, err
 	}
