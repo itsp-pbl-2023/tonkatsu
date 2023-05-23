@@ -30,8 +30,6 @@ export const LoginForm: FC<Props> = props => {
   const onSubmit: SubmitHandler<AccountData> = (data) => {
     console.log(data.userName);
     console.log(data.password);
-    const hash = "hash";
-    // const hash = TODO: HASH
     const xmlHttpRequest = new XMLHttpRequest();
     let url;
     if (props.isLogin) {
@@ -40,22 +38,17 @@ export const LoginForm: FC<Props> = props => {
       url = 'http://localhost:8000/account';
     }
     xmlHttpRequest.open('POST', url);
-    const sendData: AccountData = {
-        userName: data.userName,
-        password: hash
-    }
-    let loginInfo = JSON.stringify(sendData);
-    console.log(loginInfo);
-    xmlHttpRequest.send(loginInfo);
+    let jsonData = JSON.stringify(data);
+    xmlHttpRequest.send(jsonData);
 
     xmlHttpRequest.onreadystatechange = () => {
-			if (xmlHttpRequest.readyState == 4) {
-				if (xmlHttpRequest.status == 200) {
-					loginSuccess();
-				} else { // if (xmlHttpRequest.status == 401) {
-					loginErrorMsg();
-				}
-			}
+      if (xmlHttpRequest.readyState == 4) {
+        if (xmlHttpRequest.status == 200) {
+            loginSuccess();
+        } else { // if (xmlHttpRequest.status == 401) {
+            loginErrorMsg();
+        }
+      }
     }
 
     reset();
@@ -66,45 +59,52 @@ export const LoginForm: FC<Props> = props => {
   }
 
   const loginErrorMsg = () => {
-    setErrorMsg("NG");
+    if (!props.isLogin) { 
+      setErrorMsg("このユーザIDは既に使われてます");
+    } else {
+      setErrorMsg("ユーザIDまたはパスワードが違います");
+    }
   }
 
   return (
     <>
       <StyledForm>
+        {props.isLogin
+          ? <h2>ログイン</h2>
+          : <h2>新規登録</h2>
+        }
         <form action={props.isLogin ? "/" : "/account"} method="GET" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <p>{errorMsg}</p>
-						<div>
+            <div>
               <StyledInput 
                 id = "userID"
                 type = "text"
                 placeholder = "userID"
                 {...register('userName', { 
-                  required: 'ユーザーIDを入力してください。', 
+                  required: 'ユーザーIDを入力してください', 
                   maxLength: {
                       value: 20,
-                      message: '20文字以内で入力してください。'
+                      message: '20文字以内で入力してください'
                   },
                   pattern: {
                       value:
                           /^[A-Za-z0-9-]+$/i,
-                  message: 'ユーザーIDの形式が不正です。',
+                  message: 'ユーザーIDの形式が不正です',
                   }, 
                 })}
               />
             </div>
-						<StyledErrorMessage>
+            <StyledErrorMessage>
               <ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
             </StyledErrorMessage>
-						<div>
+            <div>
               <StyledInput
                 id = "password"
                 type = "password"
                 placeholder = "password"
                 role = "password"
                 {...register('password', { 
-                  required: 'パスワードを入力してください。', 
+                  required: 'パスワードを入力してください', 
                   maxLength: {
                       value: 20,
                       message: '20文字以内で入力してください',
@@ -112,17 +112,18 @@ export const LoginForm: FC<Props> = props => {
                   pattern: {
                       value:
                           /^[A-Za-z0-9]+$/i,
-                  message: 'パスワードの形式が不正です。',
+                  message: 'パスワードの形式が不正です',
                   }, 
                 })} 
               />
             </div>
-						<StyledErrorMessage>
-            	<ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
+            <StyledErrorMessage>
+              <ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
             </StyledErrorMessage>
             <StyledButton
               type = "submit"
               >{props.isLogin ? "ログイン" : "新規登録"}</StyledButton>
+            <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
           </div>
         </form>
         {props.isLogin
