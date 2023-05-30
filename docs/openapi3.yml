@@ -47,3 +47,17 @@ paths:
           description: OK
         '401':
           description: NG
+  /room:
+    post:
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roomId:
+                    type: string
+        '500':
+          description: Server Error
