@@ -61,3 +61,21 @@ paths:
                     type: string
         '500':
           description: Server Error
+  /ws:
+    get:
+      description: Web Socketに接続する.
+      parameters:
+        - name: "roomid"
+          in: "query"
+          description: 接続するルームID
+          required: true
+          schema:
+            type: "integer"
+            example: 123456
+      responses:
+        '101':
+          description: Web Socketでの通信を開始
+        '400':
+          description: リクエストされたルームIDを持つルームが存在しない
+        '401':
+          description: セッションがない (ログインしてない)
