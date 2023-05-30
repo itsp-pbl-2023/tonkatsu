@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 
 type Props = {
@@ -8,28 +8,20 @@ type Props = {
 
 export const StandbyGame: FC<Props> = props => {
 
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', "http://localhost:8000");
-  xhr.responseType = 'json';
-  xhr.send();
-
-  xhr.onload = function() {
-    if (xhr.status == 200) {
-      let responceObj = xhr.response;
-    }
-  }
+	const roomid = "test"
 
   // WebSocket
-  var socket = new WebSocket("ws://localhost:8000/ws");
+  useEffect(() => {
+		var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid );
+		socket.onerror = function() {
+			console.log("hello");
+		}
 
-  socket.onmessage = function (event) {
-    console.log(event.data);
-    var msg = JSON.parse(event.data);
-  }
-
-  const [roomID, setRoomID] = useState<string>("TestRoom");
-
-  socket.send("");
+		socket.onmessage = function (event) {
+			console.log(event.data);
+			var msg = JSON.parse(event.data);
+		}
+  },[])
 
   const startGame = function() {
     // ゲームを開始するとき
@@ -47,7 +39,7 @@ export const StandbyGame: FC<Props> = props => {
     return (
       <>
         <h2>部屋 ID</h2>
-        <h1>{roomID}</h1>
+        <h1>{roomid}</h1>
         <div>
           <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
         </div>
@@ -61,7 +53,7 @@ export const StandbyGame: FC<Props> = props => {
   return (
     <>
       <h2>部屋 ID</h2>
-      <h1>{roomID}</h1>
+      <h1>{roomid}</h1>
       <div>
         <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
       </div>
