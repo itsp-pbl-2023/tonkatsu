@@ -20,14 +20,16 @@ export const StandbyGame: FC<Props> = props => {
   }
 
   // WebSocket
-  var socket = new WebSocket("wss://localhost:8000");
+  var socket = new WebSocket("ws://localhost:8000/ws");
 
   socket.onmessage = function (event) {
     console.log(event.data);
     var msg = JSON.parse(event.data);
   }
 
-  const roomID = "TestRoom";
+  const [roomID, setRoomID] = useState<string>("TestRoom");
+
+  socket.send("");
 
   const startGame = function() {
     // ゲームを開始するとき
