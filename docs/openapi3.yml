@@ -70,8 +70,8 @@ paths:
           description: 接続するルームID
           required: true
           schema:
-            type: "integer"
-            example: 123456
+            type: "string"
+            example: "123456"
       responses:
         '101':
           description: Web Socketでの通信を開始
