@@ -4,6 +4,18 @@ info:
   version: '1.0'
 servers:
   - url: http://localhost:8000
+components:
+  schemas:
+    Auth:
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+      example:
+        userName: ton
+        password: katsu
 paths:
   /account:
     post:
@@ -12,15 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userName:
-                  type: string
-                password:
-                  type: string
-              example:
-                userName: ton
-                password: katsu
+              $ref: "#/components/schemas/Auth"
       responses:
         '200':
           description: OK
@@ -33,15 +37,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userName:
-                  type: string
-                password:
-                  type: string
-              example:
-                userName: ton
-                password: katsu
+              $ref: "#/components/schemas/Auth"
       responses:
         '200':
           description: OK
