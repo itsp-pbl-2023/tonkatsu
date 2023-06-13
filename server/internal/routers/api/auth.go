@@ -10,6 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserID = model.UserID
+
 type Auth struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`

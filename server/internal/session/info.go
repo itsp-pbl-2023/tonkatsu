@@ -2,7 +2,10 @@ package session
 
 import (
 	"time"
+	"tonkatsu-server/internal/model"
 )
+
+type UserID = model.UserID
 
 // sessionInfo は個々のセッション情報を表す構造体.
 type sessionInfo struct {
@@ -11,5 +14,5 @@ type sessionInfo struct {
 	accessed_at time.Time
 
 	// ユーザID
-	userID int64
+	userID UserID
 }
