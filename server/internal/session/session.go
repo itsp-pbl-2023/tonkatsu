@@ -19,8 +19,8 @@ var (
 
 const (
 	sAgeSec = 3600
-	// gin.Contextにセッション情報を保存する際のキー
-	skey = "sessionKey"
+	// gin.Contextにユーザを保存する際のキー
+	skey = "toknkatsuUserIDKey"
 	// セッションのCookieのname属性
 	sCookieName = "session"
 )
@@ -60,8 +60,29 @@ func ConfirmSession(ctx *gin.Context) bool {
 	return true
 }
 
+// ユーザIDを取得する
+// ConfirmSessionした後に用いる
+func GetUserId(ctx *gin.Context) (int64, bool) {
+	id, ok := ctx.Get(skey)
+	if !ok {
+		return 0, false
+	} else {
+		return id.(int64), true
+	}
+}
+
 
 func UpdateSession(ctx *gin.Context) error {
+	sessionID, err := ctx.Cookie(sCookieName)
+	userID, ok := GetUserId(ctx)
+	if err != nil || !ok {
+		// This must not occur
+		return err
+	}
+	slock.Lock()
+	s[sessionID] = sessionInfo{time.Now(), userID}
+	slock.Unlock()
+	ctx.SetCookie(sCookieName, sessionID, sAgeSec, "/", "", false, true)
 	return nil
 }
 
