@@ -63,22 +63,22 @@ func ConfirmSession(ctx *gin.Context) bool {
 // ユーザIDを取得する
 // ConfirmSessionした後に用いる
 func GetUserId(ctx *gin.Context) (int64, bool) {
-	id, ok := ctx.Get(sCookieName)
+	id, ok := ctx.Get(skey)
 	return id.(int64), ok
 }
 
 
 func UpdateSession(ctx *gin.Context) error {
-	sessionID, err := ctx.Cookie("session")
-	userID, ok := ctx.Get(sessionID)
+	sessionID, err := ctx.Cookie(sCookieName)
+	userID, ok := GetUserId(ctx)
 	if err != nil || !ok {
 		// This must not occur
 		return err
 	}
 	slock.Lock()
-	s[sessionID] = sessionInfo{time.Now(), userID.(int64)}
+	s[sessionID] = sessionInfo{time.Now(), userID}
 	slock.Unlock()
-	ctx.SetCookie("session", sessionID, sAgeSec, "/", "", false, true)
+	ctx.SetCookie(sCookieName, sessionID, sAgeSec, "/", "", false, true)
 	return nil
 }
 
