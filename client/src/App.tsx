@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./views/Home";
 import Account from "./views/Account";
 import Login from "./views/Login";
-import './App.css'
+import "./App.css";
 import { StandbyGame } from "./components/StandbyGame";
 
 const App = () => {
@@ -19,4 +19,4 @@ const App = () => {
   );
 };
 
-export default App
+export default App;

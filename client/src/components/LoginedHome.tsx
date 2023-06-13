@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import { useDispatch, useSelector } from "react-redux";
+import { becomeOwner } from "../app/user/userSlice";
 import styled from "styled-components";
 
 type RoomId = {
-  id: number;
-}
+  id: string;
+};
 
 export const LoginedHome = () => {
   const navigate = useNavigate();
@@ -17,34 +19,39 @@ export const LoginedHome = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<RoomId>({
-    mode: 'onChange',
+    mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<RoomId> = (data) => {
-    console.log(data.id);
+  const onSubmit: SubmitHandler<RoomId> = () => {
     const xmlHttpRequest = new XMLHttpRequest();
-    let url = 'http://localhost:8000/room/:id';
-    xmlHttpRequest.open('POST', url);
-    let jsonData = JSON.stringify(data);
-    xmlHttpRequest.send(jsonData);
+    let url = "http://localhost:8000/room";
+    xmlHttpRequest.open("POST", url);
+    xmlHttpRequest.send();
 
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
-        if (xmlHttpRequest.status == 200) {
-            roomSuccess();
-        } else { // if (xmlHttpRequest.status == 401) {
-            roomError();
+        if (xmlHttpRequest.status == 201) {
+          roomSuccess(false);
+        } else {
+          // if (xmlHttpRequest.status == 500) {
+          roomError();
         }
       }
-    }
+    };
 
     reset();
-  }
+  };
 
-  const roomSuccess = () => {
-    navigate("/");
+  const roomId = useSelector((state: any) => state.user.roomId);
+  const dispatch = useDispatch();
+
+  const roomSuccess = (isOwner: boolean) => {
+    if (isOwner) {
+      dispatch(becomeOwner());
+    }
+    navigate("/standby");
   };
 
   const roomError = () => {
@@ -56,29 +63,39 @@ export const LoginedHome = () => {
       <StyledForm>
         <form action={"/"} method="GET" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <StyledInput 
-              id = "userID"
-              type = "text"
-              placeholder = "部屋ID"
-              {...register('id', { 
-                required: '部屋IDを入力してください', 
+            <StyledInput
+              id="roomID"
+              type="text"
+              placeholder="部屋ID"
+              {...register("id", {
+                required: "部屋IDを入力してください",
+                maxLength: {
+                  value: 6,
+                  message: "6桁で入力してください",
+                },
                 pattern: {
-                    value:
-                        /^[A-Za-z0-9-]+$/i,
-                message: '部屋IDの形式が不正です',
-                }, 
+                  value: /^[0-9-]+$/i,
+                  message: "部屋IDの形式が不正です",
+                },
               })}
             />
           </div>
           <StyledErrorMessage>
-            <ErrorMessage errors={errors} name="id" render={({message}) => <span>{message}</span>} />
+            <ErrorMessage
+              errors={errors}
+              name="id"
+              render={({ message }) => <span>{message}</span>}
+            />
           </StyledErrorMessage>
           <StyledButton type="submit">部屋IDで参加</StyledButton>
           <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
         </form>
         <div>
-          <StyledButton>部屋を作成</StyledButton>
+          <StyledButton onClick={() => roomSuccess(true)}>
+            部屋を作成
+          </StyledButton>
         </div>
+        <p>roomid : {roomId}</p>
       </StyledForm>
     </>
   );
@@ -88,7 +105,7 @@ const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  background: #FFFFFF;
+  background: #ffffff;
   max-width: 360px;
   margin: 0 auto 100px;
   padding: 45px;
@@ -108,13 +125,13 @@ const StyledButton = styled.button`
   background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
-&:hover {
-  border-color: #646cff;
-}
-&:focus,
-&:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  &:hover {
+    border-color: #646cff;
+  }
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 `;
 
 const StyledInput = styled.input`
@@ -131,3 +148,8 @@ const StyledErrorMessage = styled.div`
   color: red;
   font-size: 14px;
 `;
+
+// Reduxで部屋作成者かを判断
+// submithandlerの仕様
+// POST,GET
+// リロードするとオーナー情報が初期化される
