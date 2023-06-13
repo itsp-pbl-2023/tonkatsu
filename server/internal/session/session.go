@@ -3,6 +3,7 @@ package session
 import (
 	"sync"
 	"time"
+	. "tonkatsu-server/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -26,7 +27,7 @@ const (
 )
 
 // CreateSession はユーザIDをもとにセッションのためのCookieを生成する.
-func CreateSesison(ctx *gin.Context, id int64) error {
+func CreateSesison(ctx *gin.Context, id UserID) error {
 	sUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -62,12 +63,12 @@ func ConfirmSession(ctx *gin.Context) bool {
 
 // ユーザIDを取得する
 // ConfirmSessionした後に用いる
-func GetUserId(ctx *gin.Context) (int64, bool) {
+func GetUserId(ctx *gin.Context) (UserID, bool) {
 	id, ok := ctx.Get(skey)
 	if !ok {
 		return 0, false
 	} else {
-		return id.(int64), true
+		return id.(UserID), true
 	}
 }
 
