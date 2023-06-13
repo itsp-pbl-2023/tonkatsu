@@ -28,7 +28,7 @@ func InitRouter() *gin.Engine {
 		MaxAge:          12 * time.Hour,
 	}))
 
-	r.GET("/hello_world", api.GetHelloWorld)
+	r.GET("/hello_world", api.Session, api.GetHelloWorld)
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
 

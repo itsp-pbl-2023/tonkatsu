@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func AddAccount(userName, password string) (int64, error) {
+func AddAccount(userName, password string) (UserID, error) {
 	var exists []int8
 	err := db.Select(
 		&exists,
@@ -37,10 +37,10 @@ func AddAccount(userName, password string) (int64, error) {
 		return 0, err
 	}
 
-	return user_id, err
+	return UserID(user_id), err
 }
 
-func Login(userName, password string) (int64, error) {
+func Login(userName, password string) (UserID, error) {
 	var exists []int8
 	err := db.Select(
 		&exists,
@@ -72,5 +72,5 @@ func Login(userName, password string) (int64, error) {
 		return 0, err
 	}
 
-	return user_id, err
+	return UserID(user_id), err
 }
