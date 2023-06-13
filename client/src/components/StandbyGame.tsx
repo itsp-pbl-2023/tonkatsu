@@ -1,25 +1,32 @@
-import { FC, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { Link, useNavigate } from "react-router-dom";
 
-type Props = {
-    isOwner: boolean;
-}
-
-
-export const StandbyGame: FC<Props> = props => {
+export const StandbyGame = function() {
 
 	const roomid = "test"
+	const isOwner = false;
+	const navigate = useNavigate();
+
+	// status:
+	// 0: WebSocket 接続前
+	// 1: WebSocket 接続失敗
+  // 2: WebSocket 接続成功
+	const [status, setStatus] = useState(0);
 
   // WebSocket
   useEffect(() => {
-		var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid );
+		var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid);
 		socket.onerror = function() {
 			console.log("hello");
+      setStatus(1);
 		}
 
 		socket.onmessage = function (event) {
 			console.log(event.data);
 			var msg = JSON.parse(event.data);
+      console.log(msg['command']);1
+      setStatus(2);
 		}
   },[])
 
@@ -35,7 +42,30 @@ export const StandbyGame: FC<Props> = props => {
     // 部屋を抜けるとき
   }
 
-  if (props.isOwner) {
+	const backHome = function() {
+		navigate("/");
+	}
+
+  if (status == 0) {
+    return (
+      <>
+        <h3>部屋を検索中...</h3>
+      </>
+    );
+  }
+
+  if (status == 1) {
+		return (
+      <>
+        <h3>部屋が見つかりませんでした</h3>
+				<div>
+          <StyledButton onClick={backHome}>戻る</StyledButton>
+        </div>
+      </>
+    );
+  }
+
+  if (isOwner) {
     return (
       <>
         <h2>部屋 ID</h2>

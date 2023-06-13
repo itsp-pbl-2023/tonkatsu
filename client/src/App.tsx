@@ -13,7 +13,7 @@ const App = () => {
         <Route path={`/`} element={<Home />} />
         <Route path={`/account/`} element={<Account />} />
         <Route path={`/login/`} element={<Login />} />
-        <Route path={`/standby/`} element={<StandbyGame isOwner={false} />} />
+        <Route path={`/standby/`} element={<StandbyGame />} />
       </Routes>
     </BrowserRouter>
   );
