@@ -54,3 +54,21 @@ func Login(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+// ログイン状態かどうかを確認するミドルウェア
+// session.GetUserIdが使えるようになる
+func Session(ctx *gin.Context) {
+	ok := session.ConfirmSession(ctx)
+	if !ok {
+		ctx.Status(http.StatusUnauthorized)
+		return
+	}
+
+	err := session.UpdateSession(ctx)
+	if err != nil {
+		ctx.Status(http.StatusNotImplemented)
+		return
+	}
+
+	ctx.Next()
+}

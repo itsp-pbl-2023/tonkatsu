@@ -60,8 +60,25 @@ func ConfirmSession(ctx *gin.Context) bool {
 	return true
 }
 
+// ユーザIDを取得する
+// ConfirmSessionした後に用いる
+func GetUserId(ctx *gin.Context) (int64, bool) {
+	id, ok := ctx.Get(sCookieName)
+	return id.(int64), ok
+}
+
 
 func UpdateSession(ctx *gin.Context) error {
+	sessionID, err := ctx.Cookie("session")
+	userID, ok := ctx.Get(sessionID)
+	if err != nil || !ok {
+		// This must not occur
+		return err
+	}
+	slock.Lock()
+	s[sessionID] = sessionInfo{time.Now(), userID.(int64)}
+	slock.Unlock()
+	ctx.SetCookie("session", sessionID, sAgeSec, "/", "", false, true)
 	return nil
 }
 

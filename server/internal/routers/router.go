@@ -32,5 +32,7 @@ func InitRouter() *gin.Engine {
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
 
+	// r.Use("/foo", api.Session)
+
 	return r
 }
