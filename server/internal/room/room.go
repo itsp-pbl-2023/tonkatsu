@@ -1,14 +1,18 @@
 package room
 
+import (
+	. "tonkatsu-server/internal/model"
+)
+
 type roomID string
 
 // 部屋を表す構造体.
 // 部屋の状態の保持, クライアント間のやり取りの仲介
 type Room struct {
 	id      roomID
-	host    userID
+	host    UserID
 	subscriber chan enteredClient
-	clients map[userID]roomClient
+	clients map[UserID]roomClient
 }
 
 // Roomからみたクライアント
@@ -18,19 +22,20 @@ type roomClient struct {
 	receiver <-chan ClientMessage
 }
 
-// 入室したユーザ
+// Roomへ送る, 入室したいクライアントの情報
 type enteredClient struct {
 	id userID
 	name string
 	receiver <-chan ClientMessage
+	sender chan<- RoomMessage
 }
 
 // NewRoomはユーザがいない部屋を作成する
-func NewRoom(roomid roomID, userid userID) Room {
+func NewRoom(roomId roomID, userId UserID) Room {
 	return Room{
-		id:      roomid,
-		host:    userid,
-		clients: map[userID]roomClient{},
+		id:      roomId,
+		host:    userId,
+		clients: map[UserID]roomClient{},
 	}
 }
 
@@ -52,7 +57,7 @@ func (r *Room) run() {
 			case m := <-client.receiver:
 				switch m.Command {
 				case CmdLeaveRoom:
-					user := m.Content.(userID)
+					user := m.Content.(UserID)
 					r.cancelSubscribe(user)
 					names := r.userNames()
 					r.broadCast(RoomMessage{
@@ -74,7 +79,7 @@ func (r *Room) close() {
 // 部屋にクライアントを登録する
 // r.Run GoRoutine内で呼ぶべし
 func (r *Room) subscribe(
-	id userID,
+	id UserID,
 	name string,
 	receiver <-chan ClientMessage,
 ) <-chan RoomMessage {
@@ -88,7 +93,7 @@ func (r *Room) subscribe(
 	return sender
 }
 
-func (r *Room) cancelSubscribe(id userID) {
+func (r *Room) cancelSubscribe(id UserID) {
 	delete(r.clients, id)
 }
 
