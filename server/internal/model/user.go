@@ -1,11 +1,5 @@
 package model
 
-import (
-
-
-	// "github.com/jmoiron/sqlx"
-)
-
 type UserID int64
 
 type User struct {

@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"tonkatsu-server/internal/model"
+	. "tonkatsu-server/internal/model"
 	"tonkatsu-server/internal/session"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserID = model.UserID
 
 type Auth struct {
 	UserName string `json:"userName"`
@@ -25,7 +24,7 @@ func Account(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 	}
 
-	userID, err := model.AddAccount(auth.UserName, auth.Password)
+	userID, err := AddAccount(auth.UserName, auth.Password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		ctx.Status(http.StatusBadRequest)
@@ -45,7 +44,7 @@ func Login(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 	}
 
-	userID, err := model.Login(auth.UserName, auth.Password)
+	userID, err := Login(auth.UserName, auth.Password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		ctx.Status(http.StatusBadRequest)

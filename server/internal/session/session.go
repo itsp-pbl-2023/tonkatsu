@@ -3,6 +3,7 @@ package session
 import (
 	"sync"
 	"time"
+	. "tonkatsu-server/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
