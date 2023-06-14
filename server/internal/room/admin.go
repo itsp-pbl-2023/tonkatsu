@@ -3,6 +3,7 @@ package room
 import (
 	"math/rand"
 	"sync"
+	. "tonkatsu-server/internal/model"
 )
 
 type RoomAdmin struct {
@@ -13,9 +14,9 @@ type RoomAdmin struct {
 var ra = RoomAdmin{}
 
 // 部屋を作成し走らせる
-func (ra *RoomAdmin) CreateRoom(userID userID) roomID {
+func (ra *RoomAdmin) CreateRoom(userId UserID) roomID {
 	roomID := ra.generateRoomId()
-	room := NewRoom(roomID, userID)
+	room := NewRoom(roomID, userId)
 	ra.mu.Lock()
 	ra.rooms[roomID] = room
 	ra.mu.Unlock()
@@ -36,26 +37,32 @@ func (ra *RoomAdmin) existsRoom(id roomID) bool {
 	return ok
 }
 
+// Roomへクライアントを入室させるメッセージを送る.
+// Room->Client　のchannelを返す. 
 func (ra *RoomAdmin) clientEnterRoom (
-	roomID roomID,
-	userID userID,
+	roomId roomID,
+	userId UserID,
 	userName string,
 	receiver <-chan ClientMessage,
-) bool {
+) (<-chan RoomMessage, bool) {
 	ra.mu.RLock()
-	room, ok := ra.rooms[roomID]
+	room, ok := ra.rooms[roomId]
 	ra.mu.RUnlock()
 	if !ok {
-		return false
+		return nil, false
 	}
+	sender := make(chan RoomMessage, 1)
 	room.subscriber <- enteredClient{
-		id: userID,
+		id: userId,
 		name: userName,
 		receiver: receiver,
+		sender: sender,
 	}
-	return true
+	return sender, true
 }
 
+// RoomIDをランダム生成に生成する
+// すでにあるRoomIDは使わない
 func (ra *RoomAdmin) generateRoomId() roomID {
 	n := 6
 	s := make([]byte, n, n)
