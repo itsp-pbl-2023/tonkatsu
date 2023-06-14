@@ -38,8 +38,8 @@ func (ra *RoomAdmin) existsRoom(id roomID) bool {
 }
 
 // Roomへクライアントを入室させるメッセージを送る.
-// Room->Client　のchannelを返す. 
-func (ra *RoomAdmin) clientEnterRoom (
+// Room->Client　のchannelを返す.
+func (ra *RoomAdmin) clientEnterRoom(
 	roomId roomID,
 	userId UserID,
 	userName string,
@@ -53,10 +53,10 @@ func (ra *RoomAdmin) clientEnterRoom (
 	}
 	sender := make(chan *RoomMessage, 1)
 	room.subscriber <- &enteredClient{
-		id: userId,
-		name: userName,
+		id:       userId,
+		name:     userName,
 		receiver: receiver,
-		sender: sender,
+		sender:   sender,
 	}
 	return sender, true
 }
@@ -76,4 +76,9 @@ func (ra *RoomAdmin) generateRoomId() roomID {
 			return id
 		}
 	}
+}
+
+func RoomAdminCreateRoom(userID userID) roomID {
+	roomID := ra.CreateRoom(userID)
+	return roomID
 }
