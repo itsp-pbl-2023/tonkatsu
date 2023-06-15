@@ -9,9 +9,11 @@ import (
 
 	"tonkatsu-server/internal/model"
 	"tonkatsu-server/internal/routers"
+	"tonkatsu-server/internal/streamer"
 )
 
 func main() {
+	streamer.NewStreamer()
 	router := routers.InitRouter()
 	port_str := os.Getenv("SERVER_PORT")
 	port, err := strconv.Atoi(port_str)
