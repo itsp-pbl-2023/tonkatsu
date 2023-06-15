@@ -46,7 +46,7 @@ func ConnectWS(ctx *gin.Context) {
 	var userNames UsersInRoom
 	// maxWait * waitMiliSec ms だけRoomからの応答を待つ.
 	// 応答がなければRoomが閉じたと判断し終了.
-	for t, maxWait, waitMiliSec := 0, 10, time.Duration(100); true; t += 1 {
+	for t, maxWait, waitMiliSec := 0, 10, 100 * time.Millisecond; true; t += 1 {
 		select {
 		case m := <-clientReceiver:
 			// m should CmdUsers message.
@@ -57,7 +57,7 @@ func ConnectWS(ctx *gin.Context) {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
-		time.Sleep(waitMiliSec * time.Millisecond)
+		time.Sleep(waitMiliSec)
 	}
 
 	// websocket開始
