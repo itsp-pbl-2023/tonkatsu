@@ -1,7 +1,9 @@
 package room
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 	"tonkatsu-server/internal/model"
@@ -34,7 +36,7 @@ func ConnectWS(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 	}
 
-	clientSender := make(chan ClientMessage, 1)
+	clientSender := make(chan *ClientMessage, 1)
 	clientReceiver, ok := ra.clientEnterRoom(
 		roomId,
 		userId,
@@ -60,10 +62,18 @@ func ConnectWS(ctx *gin.Context) {
 
 	// websocket開始
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	conn.WriteJSON(model.WSMessageForSend{
+	if err != nil {
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+	defer conn.Close()
+	err = conn.WriteJSON(model.WSMessageForSend{
 		Command: model.WSCmdUpdateMembers,
 		Content: model.UpdateMembers{UserNames: userNames},
 	})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 
 	client := newClient(
 		userId,
@@ -78,5 +88,4 @@ func ConnectWS(ctx *gin.Context) {
 	go client.listenWS(&wg)
 	go client.listenRoom(&wg)
 	wg.Wait()
-	conn.Close()
 }

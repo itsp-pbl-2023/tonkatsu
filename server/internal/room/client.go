@@ -11,8 +11,8 @@ type client struct {
 	id userID
 	name string
 	conn *websocket.Conn
-	sender chan<- ClientMessage
-	receiver <-chan RoomMessage
+	sender chan<- *ClientMessage
+	receiver <-chan *RoomMessage
 	close bool
 }
 
@@ -20,8 +20,8 @@ func newClient(
 	id userID,
 	name string,
 	conn *websocket.Conn,
-	sender chan<- ClientMessage,
-	receiver <-chan RoomMessage,
+	sender chan<- *ClientMessage,
+	receiver <-chan *RoomMessage,
 ) client {
 	return client {
 		id: id,

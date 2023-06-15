@@ -11,23 +11,23 @@ type roomID string
 type Room struct {
 	id      roomID
 	host    UserID
-	subscriber chan enteredClient
+	subscriber chan *enteredClient
 	clients map[UserID]roomClient
 }
 
 // Roomからみたクライアント
 type roomClient struct {
 	name     string
-	sender   chan<- RoomMessage
-	receiver <-chan ClientMessage
+	sender   chan<- *RoomMessage
+	receiver <-chan *ClientMessage
 }
 
 // Roomへ送る, 入室したいクライアントの情報
 type enteredClient struct {
 	id userID
 	name string
-	receiver <-chan ClientMessage
-	sender chan<- RoomMessage
+	receiver <-chan *ClientMessage
+	sender chan<- *RoomMessage
 }
 
 // NewRoomはユーザがいない部屋を作成する
@@ -46,7 +46,7 @@ func (r *Room) run() {
 		case c := <- r.subscriber:
 			r.subscribe(c.id, c.name, c.receiver)
 			names := r.userNames()
-			r.broadCast(RoomMessage{
+			r.broadCast(&RoomMessage{
 				Command: CmdUsers,
 				Content: names,
 			})
@@ -60,7 +60,7 @@ func (r *Room) run() {
 					user := m.Content.(UserID)
 					r.cancelSubscribe(user)
 					names := r.userNames()
-					r.broadCast(RoomMessage{
+					r.broadCast(&RoomMessage{
 						Command: CmdUsers,
 						Content: names,
 					})
@@ -81,9 +81,9 @@ func (r *Room) close() {
 func (r *Room) subscribe(
 	id UserID,
 	name string,
-	receiver <-chan ClientMessage,
-) <-chan RoomMessage {
-	sender := make(chan RoomMessage, 1)
+	receiver <-chan *ClientMessage,
+) <-chan *RoomMessage {
+	sender := make(chan *RoomMessage, 1)
 	client := roomClient{
 		name:     name,
 		receiver: receiver,
@@ -97,7 +97,7 @@ func (r *Room) cancelSubscribe(id UserID) {
 	delete(r.clients, id)
 }
 
-func (r *Room) broadCast(m RoomMessage) {
+func (r *Room) broadCast(m *RoomMessage) {
 	for _, client := range r.clients {
 		client.sender <- m
 	}
