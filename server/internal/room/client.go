@@ -1,7 +1,8 @@
 package room
 
 import (
-	"tonkatsu-server/internal/model"
+	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -32,4 +33,36 @@ func newClient(
 	}
 }
 
+func (client *client) listenWS(wg *sync.WaitGroup) {
+	// TODO
+	// for {
+	// 	messageType, message, err := client.conn.ReadMessage()
+	// 	if err != nil {
+	// 		client.close = true
+	// 		return
+	// 	}
+	// 	if messageType != websocket.TextMessage {
+	// 		continue
+	// 	}
+	// }
+	
+	time.Sleep(time.Second * 5)
+	wg.Done()
+}
 
+func (client *client) listenRoom(wg *sync.WaitGroup) {
+	// TODO
+	// for {
+	// 	select {
+	// 	case m := <-client.receiver:
+	// 		switch m.Command {
+	// 		case CmdClose:
+	// 			client.close = true
+	// 			return
+	// 		}
+	// 	}
+	// }
+
+	time.Sleep(time.Second * 5)
+	wg.Done()
+}
