@@ -1,6 +1,6 @@
 package model
 
-type WSMessageForReceive struct {
+type WSMessageToReceive struct {
 	Command string `json:"command"`
 	Content any `json:"content,omitempty"`
 }

@@ -9,10 +9,10 @@ type roomID string
 // 部屋を表す構造体.
 // 部屋の状態の保持, クライアント間のやり取りの仲介
 type Room struct {
-	id      roomID
-	host    UserID
+	id         roomID
+	host       UserID
 	subscriber chan *enteredClient
-	clients map[UserID]roomClient
+	clients    map[UserID]roomClient
 }
 
 // Roomからみたクライアント
@@ -24,10 +24,10 @@ type roomClient struct {
 
 // Roomへ送る, 入室したいクライアントの情報
 type enteredClient struct {
-	id userID
-	name string
+	id       userID
+	name     string
 	receiver <-chan *ClientMessage
-	sender chan<- *RoomMessage
+	sender   chan<- *RoomMessage
 }
 
 // NewRoomはユーザがいない部屋を作成する
@@ -43,11 +43,11 @@ func (r *Room) run() {
 	defer r.close()
 	for {
 		select {
-		case c := <- r.subscriber:
+		case c := <-r.subscriber:
 			r.subscribe(c.id, c.name, c.receiver)
 			names := r.userNames()
 			r.broadCast(&RoomMessage{
-				Command: CmdUsers,
+				Command: CmdUsersInRoom,
 				Content: names,
 			})
 		}
@@ -61,7 +61,7 @@ func (r *Room) run() {
 					r.cancelSubscribe(user)
 					names := r.userNames()
 					r.broadCast(&RoomMessage{
-						Command: CmdUsers,
+						Command: CmdUsersInRoom,
 						Content: names,
 					})
 				default:

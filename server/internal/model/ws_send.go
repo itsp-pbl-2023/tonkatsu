@@ -1,8 +1,8 @@
 package model
 
-type WSMessageForSend struct {
+type WSMessageToSend struct {
 	Command string `json:"command"`
-	Content any `json:"content,omitempty"`
+	Content any    `json:"content,omitempty"`
 }
 
 const (
