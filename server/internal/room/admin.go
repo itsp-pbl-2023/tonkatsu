@@ -43,16 +43,16 @@ func (ra *RoomAdmin) clientEnterRoom (
 	roomId roomID,
 	userId UserID,
 	userName string,
-	receiver <-chan ClientMessage,
-) (<-chan RoomMessage, bool) {
+	receiver <-chan *ClientMessage,
+) (<-chan *RoomMessage, bool) {
 	ra.mu.RLock()
 	room, ok := ra.rooms[roomId]
 	ra.mu.RUnlock()
 	if !ok {
 		return nil, false
 	}
-	sender := make(chan RoomMessage, 1)
-	room.subscriber <- enteredClient{
+	sender := make(chan *RoomMessage, 1)
+	room.subscriber <- &enteredClient{
 		id: userId,
 		name: userName,
 		receiver: receiver,

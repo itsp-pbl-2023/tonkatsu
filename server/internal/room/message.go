@@ -2,37 +2,36 @@ package room
 
 // Roomが送信するメッセージ
 type RoomMessage struct {
-	Command RoomMCommand
+	Command RoomMsgCommand
 	Content any // Goには列挙型がない!
 }
 
 // Roomが送信するメッセージのコマンド
-type RoomMCommand int
+type RoomMsgCommand int
 
 const (
-	// 部屋にいるユーザー
-	CmdUsers = RoomMCommand(iota)
+	// 部屋にいるユーザー  
+	// Content: UsersInRoom
+	CmdUsersInRoom = RoomMsgCommand(iota)
 	// 部屋を閉じる
+	// Content: nil
 	CmdClose
 )
 
 // 部屋にいるユーザ名のリスト
 type UsersInRoom []string
 
-
 // Clientが送信するメッセージ
 type ClientMessage struct {
-	Command ClientMCommand
+	Command ClientMsgCommand
 	Content any
 }
 
 // Clientが送信するメッセージのコマンド
-type ClientMCommand int
+type ClientMsgCommand int
 
 const (
 	// 退室
-	CmdLeaveRoom = ClientMCommand(iota)
+	// Content: nil
+	CmdLeaveRoom = ClientMsgCommand(iota)
 )
-
-// 退室したユーザのユーザid
-type LeftUser userID
