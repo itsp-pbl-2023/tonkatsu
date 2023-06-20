@@ -3,7 +3,7 @@ import LoginForm from "../components/LoginForm";
 const Login = () => {
   return (
     <>
-      <LoginForm isLogin={true}/>
+      <LoginForm isLogin={true} />
     </>
   );
 };

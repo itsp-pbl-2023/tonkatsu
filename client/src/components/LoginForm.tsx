@@ -44,6 +44,7 @@ export const LoginForm: FC<Props> = props => {
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
         if (xmlHttpRequest.status == 200) {
+            console.log(xmlHttpRequest)
             loginSuccess();
         } else { // if (xmlHttpRequest.status == 401) {
             loginErrorMsg();
