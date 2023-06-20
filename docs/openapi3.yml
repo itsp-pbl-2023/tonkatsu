@@ -77,9 +77,7 @@ paths:
           description: セッションがない (ログインしてない)
   /chatgpt:
     post:
-      desctiption: ChatGPTにリクエストを投げる実験
       requestBody:
-        description: ChatGPTに入力するテキスト
         content:
             application/json:
               schema:
@@ -88,7 +86,7 @@ paths:
                   message:
                     type: string
                     example: "とんかつについて説明してください。"
-          responses:
+      responses:
             "200":
               description: OK
               content:
@@ -99,6 +97,5 @@ paths:
                       message:
                         type: string
                         example: "{{とんかつに関する説明}}"
-                
             "500":
               description: ServerError
