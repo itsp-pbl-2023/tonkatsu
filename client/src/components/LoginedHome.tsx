@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useDispatch, useSelector } from "react-redux";
-import { becomeOwner } from "../app/user/userSlice";
+import { becomeOwner, createRoom } from "../app/user/userSlice";
 import styled from "styled-components";
 
 type RoomId = {
@@ -11,6 +11,8 @@ type RoomId = {
 };
 
 export const LoginedHome = () => {
+  const roomId = useSelector((state: any) => state.user.roomId);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -33,6 +35,8 @@ export const LoginedHome = () => {
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
         if (xmlHttpRequest.status == 201) {
+          const jsonObj = JSON.parse(xmlHttpRequest.responseText);
+          dispatch(createRoom(jsonObj.roomId));
           roomSuccess(false);
         } else {
           // if (xmlHttpRequest.status == 500) {
@@ -43,9 +47,6 @@ export const LoginedHome = () => {
 
     reset();
   };
-
-  const roomId = useSelector((state: any) => state.user.roomId);
-  const dispatch = useDispatch();
 
   const roomSuccess = (isOwner: boolean) => {
     if (isOwner) {
