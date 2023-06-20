@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type Auth struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`

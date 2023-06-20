@@ -31,6 +31,7 @@ func InitRouter() *gin.Engine {
 	r.GET("/hello_world", api.Session, api.GetHelloWorld)
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
+	r.POST("/room", api.Session, api.CreateRoom)
 
 	return r
 }

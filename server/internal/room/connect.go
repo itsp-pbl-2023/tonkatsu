@@ -21,7 +21,7 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 }}
 
 func ConnectWS(ctx *gin.Context) {
-	roomId := roomID(ctx.Query("room"))
+	roomId := RoomID(ctx.Query("room"))
 	if roomId == "" {
 		ctx.Status(http.StatusBadRequest)
 		return
