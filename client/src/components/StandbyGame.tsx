@@ -89,11 +89,11 @@ export const StandbyGame = function() {
   }
 
   // オーナー
-  if (localStorage.getItem("isOwner")) {
+  if (localStorage.getItem("isOwner") == "true") {
     return (
       <>
-        <h3>部屋 ID</h3>
-        <h2>{roomid}</h2>
+        <h2>部屋 ID</h2>
+        <h1>{roomid}</h1>
         <div>
           <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
         </div>
