@@ -1,6 +1,8 @@
 package session
 
 import (
+	"fmt"
+	"os"
 	"sync"
 	"time"
 	. "tonkatsu-server/internal/model"
@@ -23,7 +25,7 @@ const (
 	// gin.Contextにユーザを保存する際のキー
 	skey = "toknkatsuUserIDKey"
 	// セッションのCookieのname属性
-	sCookieName = "session"
+	sCookieName = "tonkatsu-session"
 )
 
 // CreateSession はユーザIDをもとにセッションのためのCookieを生成する.
@@ -75,10 +77,15 @@ func GetUserId(ctx *gin.Context) (UserID, bool) {
 
 func UpdateSession(ctx *gin.Context) error {
 	sessionID, err := ctx.Cookie(sCookieName)
-	userID, ok := GetUserId(ctx)
-	if err != nil || !ok {
-		// This must not occur
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		return err
+	}
+	userID, ok := GetUserId(ctx)
+	if !ok {
+		// This must not occur
+		fmt.Fprintln(os.Stderr, "Cannot get user id in updating session")
+		return fmt.Errorf("Cannot get user id")
 	}
 	slock.Lock()
 	s[sessionID] = sessionInfo{time.Now(), userID}
