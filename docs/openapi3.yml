@@ -78,16 +78,17 @@ paths:
   /chatgpt:
     post:
       requestBody:
+        description: 認証情報
         content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "とんかつについて説明してください。"
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "とんかつの説明を書いてください。"
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -96,6 +97,6 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "{{とんかつに関する説明}}"
-        "500":
-          description: ServerError
+                    example: "{{とんかつの説明}}"
+        '500':
+          description: Server Error
