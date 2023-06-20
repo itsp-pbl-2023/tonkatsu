@@ -1,8 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { becomeOwner, createRoom } from "../app/user/userSlice";
 import styled from "styled-components";
 
@@ -11,22 +11,31 @@ type RoomId = {
 };
 
 export const LoginedHome = () => {
-  const roomId = useSelector((state: any) => state.user.roomId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   const {
-    register,
     handleSubmit,
+    register,
     reset,
     formState: { errors },
   } = useForm<RoomId>({
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<RoomId> = () => {
+  const joinButton: SubmitHandler<RoomId> = (data) => {
+    if (data.id.length != 6) {
+      setErrorMsg("6桁で入力してください");
+    } else {
+      console.log(data.id);
+      dispatch(createRoom(data.id));
+      roomSuccess();
+    }
+    reset();
+  };
+
+  const createButton = () => {
     const xmlHttpRequest = new XMLHttpRequest();
     let url = "http://localhost:8000/room";
     xmlHttpRequest.open("POST", url);
@@ -37,37 +46,25 @@ export const LoginedHome = () => {
         if (xmlHttpRequest.status == 201) {
           const jsonObj = JSON.parse(xmlHttpRequest.responseText);
           dispatch(createRoom(jsonObj.roomId));
-          roomSuccess(false);
-        } else {
-          // if (xmlHttpRequest.status == 500) {
-          roomError();
+          dispatch(becomeOwner());
         }
       }
+      roomSuccess();
     };
-
-    reset();
   };
 
-  const roomSuccess = (isOwner: boolean) => {
-    if (isOwner) {
-      dispatch(becomeOwner());
-    }
+  const roomSuccess = () => {
     navigate("/standby");
-  };
-
-  const roomError = () => {
-    setErrorMsg("部屋が見つかりません");
   };
 
   return (
     <>
       <StyledForm>
-        <form action={"/"} method="GET" onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(joinButton)}>
           <div>
             <StyledInput
-              id="roomID"
               type="text"
-              placeholder="部屋ID"
+              placeholder="6桁の部屋ID"
               {...register("id", {
                 required: "部屋IDを入力してください",
                 maxLength: {
@@ -92,11 +89,8 @@ export const LoginedHome = () => {
           <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
         </form>
         <div>
-          <StyledButton onClick={() => roomSuccess(true)}>
-            部屋を作成
-          </StyledButton>
+          <StyledButton onClick={createButton}>部屋を作成</StyledButton>
         </div>
-        <p>roomid : {roomId}</p>
       </StyledForm>
     </>
   );
