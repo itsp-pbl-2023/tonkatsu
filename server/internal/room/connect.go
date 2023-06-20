@@ -81,6 +81,7 @@ func ConnectWS(ctx *gin.Context) {
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		return
 	}
 
 	client := newClient(
