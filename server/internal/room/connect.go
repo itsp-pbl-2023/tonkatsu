@@ -21,7 +21,7 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 }}
 
 func ConnectWS(ctx *gin.Context) {
-	roomId := RoomID(ctx.Query("room"))
+	roomId := RoomID(ctx.Query("roomid"))
 	if roomId == "" {
 		ctx.Status(http.StatusBadRequest)
 		return
@@ -43,6 +43,11 @@ func ConnectWS(ctx *gin.Context) {
 		userName,
 		clientSender,
 	)
+	if !ok {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
 	var userNames UsersInRoom
 	// maxWait * waitMiliSec ms だけRoomからの応答を待つ.
 	// 応答がなければRoomが閉じたと判断し終了.
@@ -52,6 +57,7 @@ func ConnectWS(ctx *gin.Context) {
 			// m should CmdUsers message.
 			userNames = m.Content.(UsersInRoom)
 			break
+		default:
 		}
 		if t == maxWait {
 			ctx.Status(http.StatusBadRequest)
@@ -59,6 +65,7 @@ func ConnectWS(ctx *gin.Context) {
 		}
 		time.Sleep(waitMiliSec)
 	}
+	fmt.Println("Entered")
 
 	// websocket開始
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)

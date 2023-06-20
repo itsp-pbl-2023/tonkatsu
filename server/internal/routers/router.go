@@ -32,6 +32,7 @@ func InitRouter() *gin.Engine {
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
 	r.POST("/room", api.Session, api.CreateRoom)
+	r.GET("/ws", api.Session, api.WebSocket)
 
 	return r
 }

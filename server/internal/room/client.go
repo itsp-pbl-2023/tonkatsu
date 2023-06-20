@@ -103,6 +103,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					return
 				}
 			}
+		default:
 		}
 	}
 }

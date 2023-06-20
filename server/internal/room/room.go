@@ -51,6 +51,7 @@ func (r *Room) run() {
 				Command: CmdUsersInRoom,
 				Content: names,
 			})
+		default:
 		}
 		// クライアントからのメッセージを処理
 		for _, client := range r.clients {
@@ -68,6 +69,7 @@ func (r *Room) run() {
 				default:
 					// todo
 				}
+			default:
 			}
 		}
 	}
