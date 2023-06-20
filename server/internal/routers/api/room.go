@@ -9,10 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type roomID string
-
 type ResponseRoomID struct {
-	roomID roomID `json:"roomId"`
+	RoomID room.RoomID `json:"roomId"`
 }
 
 func CreateRoom(ctx *gin.Context) {
@@ -25,6 +23,6 @@ func CreateRoom(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	response.roomID = roomID(room.CreateRoom(userID))
+	response.RoomID = room.CreateRoom(userID)
 	ctx.JSON(http.StatusOK, response)
 }

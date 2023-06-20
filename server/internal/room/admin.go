@@ -8,16 +8,16 @@ import (
 
 type RoomAdmin struct {
 	mu    sync.RWMutex
-	rooms map[roomID]*Room
+	rooms map[RoomID]*Room
 }
 
 var ra = RoomAdmin{
 	mu:    sync.RWMutex{},
-	rooms: map[roomID]*Room{},
+	rooms: map[RoomID]*Room{},
 }
 
 // 部屋を作成し走らせる
-func CreateRoom(userId UserID) roomID {
+func CreateRoom(userId UserID) RoomID {
 	roomID := ra.generateRoomId()
 	room := NewRoom(roomID, userId)
 	ra.mu.Lock()
@@ -27,13 +27,13 @@ func CreateRoom(userId UserID) roomID {
 	return roomID
 }
 
-func (ra *RoomAdmin) deleteRoom(id roomID) {
+func (ra *RoomAdmin) deleteRoom(id RoomID) {
 	ra.mu.Lock()
 	delete(ra.rooms, id)
 	ra.mu.Unlock()
 }
 
-func (ra *RoomAdmin) existsRoom(id roomID) bool {
+func (ra *RoomAdmin) existsRoom(id RoomID) bool {
 	ra.mu.RLock()
 	_, ok := ra.rooms[id]
 	ra.mu.RUnlock()
@@ -43,7 +43,7 @@ func (ra *RoomAdmin) existsRoom(id roomID) bool {
 // Roomへクライアントを入室させるメッセージを送る.
 // Room->Client　のchannelを返す.
 func (ra *RoomAdmin) clientEnterRoom(
-	roomId roomID,
+	roomId RoomID,
 	userId UserID,
 	userName string,
 	receiver <-chan *ClientMessage,
@@ -66,7 +66,7 @@ func (ra *RoomAdmin) clientEnterRoom(
 
 // RoomIDをランダム生成に生成する
 // すでにあるRoomIDは使わない
-func (ra *RoomAdmin) generateRoomId() roomID {
+func (ra *RoomAdmin) generateRoomId() RoomID {
 	n := 6
 	s := make([]byte, n, n)
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -74,7 +74,7 @@ func (ra *RoomAdmin) generateRoomId() roomID {
 		for i := range s {
 			s[i] = letters[rand.Intn(len(letters))]
 		}
-		id := roomID(s)
+		id := RoomID(s)
 		if !ra.existsRoom(id) {
 			return id
 		}

@@ -4,12 +4,12 @@ import (
 	. "tonkatsu-server/internal/model"
 )
 
-type roomID string
+type RoomID string
 
 // 部屋を表す構造体.
 // 部屋の状態の保持, クライアント間のやり取りの仲介
 type Room struct {
-	id         roomID
+	id         RoomID
 	host       UserID
 	subscriber chan *enteredClient
 	clients    map[UserID]roomClient
@@ -31,7 +31,7 @@ type enteredClient struct {
 }
 
 // NewRoomはユーザがいない部屋を作成する
-func NewRoom(roomId roomID, userId UserID) Room {
+func NewRoom(roomId RoomID, userId UserID) Room {
 	return Room{
 		id:         roomId,
 		host:       userId,
