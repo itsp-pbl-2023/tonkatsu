@@ -38,13 +38,23 @@ export const StandbyGame = function() {
       switch(msg['command']) {
       case 'update_members':
         setUserNames(msg['command']['user_name'])
+				break
+			case 'start_game':
+				moveGame()
+				break
       }
       setStatus(2);
 		};
   },[])
 
+	const moveGame = function() {
+		// ゲーム画面への移動
+	}
+
   const startGame = function() {
     // ゲームを開始するとき
+		var sendJson = {"command": "start_game"};
+		socketRef.current?.send(JSON.stringify(sendJson));
   }
 
   const cancelGame = function() {
