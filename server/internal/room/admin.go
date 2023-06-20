@@ -8,17 +8,20 @@ import (
 
 type RoomAdmin struct {
 	mu    sync.RWMutex
-	rooms map[roomID]Room
+	rooms map[roomID]*Room
 }
 
-var ra = RoomAdmin{}
+var ra = RoomAdmin{
+	mu:    sync.RWMutex{},
+	rooms: map[roomID]*Room{},
+}
 
 // 部屋を作成し走らせる
-func (ra *RoomAdmin) CreateRoom(userId UserID) roomID {
+func CreateRoom(userId UserID) roomID {
 	roomID := ra.generateRoomId()
 	room := NewRoom(roomID, userId)
 	ra.mu.Lock()
-	ra.rooms[roomID] = room
+	ra.rooms[roomID] = &room
 	ra.mu.Unlock()
 	go room.run()
 	return roomID
@@ -76,9 +79,4 @@ func (ra *RoomAdmin) generateRoomId() roomID {
 			return id
 		}
 	}
-}
-
-func RoomAdminCreateRoom(userID userID) roomID {
-	roomID := ra.CreateRoom(userID)
-	return roomID
 }

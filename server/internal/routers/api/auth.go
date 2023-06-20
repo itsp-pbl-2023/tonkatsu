@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type Auth struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
@@ -18,6 +17,7 @@ type Auth struct {
 
 // ユーザー登録
 func Account(ctx *gin.Context) {
+	fmt.Printf("CreateACCOUNT!!!!!!!!")
 	var auth Auth
 	err := ctx.BindJSON(&auth)
 	if err != nil {

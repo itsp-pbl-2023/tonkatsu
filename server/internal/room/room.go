@@ -33,9 +33,10 @@ type enteredClient struct {
 // NewRoomはユーザがいない部屋を作成する
 func NewRoom(roomId roomID, userId UserID) Room {
 	return Room{
-		id:      roomId,
-		host:    userId,
-		clients: map[UserID]roomClient{},
+		id:         roomId,
+		host:       userId,
+		subscriber: make(chan *enteredClient, 1),
+		clients:    map[UserID]roomClient{},
 	}
 }
 
