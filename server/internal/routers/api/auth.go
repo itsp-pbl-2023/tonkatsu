@@ -17,7 +17,6 @@ type Auth struct {
 
 // ユーザー登録
 func Account(ctx *gin.Context) {
-	fmt.Printf("CreateACCOUNT!!!!!!!!")
 	var auth Auth
 	err := ctx.BindJSON(&auth)
 	if err != nil {
