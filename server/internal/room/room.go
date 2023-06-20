@@ -45,7 +45,7 @@ func (r *Room) run() {
 	for {
 		select {
 		case c := <-r.subscriber:
-			r.subscribe(c.id, c.name, c.receiver)
+			r.subscribe(c.id, c.name, c.receiver, c.sender)
 			names := r.userNames()
 			r.broadCast(&RoomMessage{
 				Command: CmdUsersInRoom,
@@ -85,15 +85,14 @@ func (r *Room) subscribe(
 	id UserID,
 	name string,
 	receiver <-chan *ClientMessage,
-) <-chan *RoomMessage {
-	sender := make(chan *RoomMessage, 1)
+	sender chan<- *RoomMessage,
+ ) {
 	client := roomClient{
 		name:     name,
 		receiver: receiver,
 		sender:   sender,
 	}
 	r.clients[id] = client
-	return sender
 }
 
 func (r *Room) cancelSubscribe(id UserID) {
