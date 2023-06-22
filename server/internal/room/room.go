@@ -13,6 +13,7 @@ type Room struct {
 	host       UserID
 	subscriber chan *enteredClient
 	clients    map[UserID]roomClient
+	closer     chan bool
 }
 
 // Roomからみたクライアント
@@ -51,6 +52,8 @@ func (r *Room) run() {
 				Command: CmdUsersInRoom,
 				Content: names,
 			})
+		case <-r.closer:
+			return
 		default:
 		}
 		// クライアントからのメッセージを処理
@@ -76,6 +79,12 @@ func (r *Room) run() {
 }
 
 func (r *Room) close() {
+	for _, client := range r.clients {
+		client.sender <- &RoomMessage{
+			Command: CmdClose,
+			Content: nil,
+		}
+	}
 	ra.deleteRoom(r.id)
 }
 

@@ -15,7 +15,7 @@ type client struct {
 	conn     *websocket.Conn
 	sender   chan<- *ClientMessage
 	receiver <-chan *RoomMessage
-	close    atomic.Bool
+	left    atomic.Bool
 }
 
 func newClient(
@@ -31,9 +31,9 @@ func newClient(
 		conn:     conn,
 		sender:   sender,
 		receiver: receiver,
-		close:    atomic.Bool{},
+		left:    atomic.Bool{},
 	}
-	new.close.Store(false)
+	new.left.Store(false)
 	return new
 }
 
@@ -45,11 +45,11 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			Command: CmdLeaveRoom,
 			Content: nil,
 		}
-		client.close.Store(true)
+		client.left.Store(true)
 	}()
 
 	for {
-		if client.close.Load() {
+		if client.left.Load() {
 			return
 		}
 		deadline := time.Now().Add(time.Minute * 10)
@@ -81,11 +81,11 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 			Command: model.WSCmdLeave,
 			Content: nil,
 		})
-		client.close.Store(true)
+		client.left.Store(true)
 	}()
 
 	for {
-		if client.close.Load() {
+		if client.left.Load() {
 			return
 		}
 		select {
