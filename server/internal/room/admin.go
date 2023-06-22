@@ -40,6 +40,13 @@ func (ra *RoomAdmin) existsRoom(id RoomID) bool {
 	return ok
 }
 
+func (ra *RoomAdmin) getRoom(id RoomID) (*Room, bool) {
+	ra.mu.RLock()
+	room, ok := ra.rooms[id]
+	ra.mu.RUnlock()
+	return room, ok
+}
+
 // Roomへクライアントを入室させるメッセージを送る.
 // Room->Client　のchannelを返す.
 func (ra *RoomAdmin) clientEnterRoom(
