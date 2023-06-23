@@ -22,5 +22,5 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 	response.RoomID = room.CreateRoom(userID)
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusCreated, response)
 }
