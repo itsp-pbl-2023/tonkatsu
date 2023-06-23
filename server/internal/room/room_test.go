@@ -1,6 +1,7 @@
 package room
 
 import (
+	"fmt"
 	"testing"
 	"time"
 	"tonkatsu-server/internal/model"
@@ -27,7 +28,6 @@ func TestCreateRoom(t *testing.T) {
 func TestEnterRoom(t *testing.T) {
 	userId := model.UserID(1)
 	name := "test"
-	clientSender := make(chan *ClientMessage, 1)
 
 	roomId := CreateRoom(userId)
 	room, _ := ra.getRoom(roomId)
@@ -40,7 +40,7 @@ func TestEnterRoom(t *testing.T) {
 		roomId,
 		userId,
 		name,
-		clientSender,
+		nil,
 	)
 	if (!ok) {
 		t.Fatal("Failed to enter room.")
@@ -50,20 +50,20 @@ func TestEnterRoom(t *testing.T) {
 		userId,
 		name,
 		nil,
-		clientSender,
+		nil,
 		clientReceiver,
 	)
 
-	logger := make(chan model.WSMessageToSend, 1)
+	logger := make(chan *model.WSMessageToSend, 1)
 	ticker := time.NewTicker(time.Second)
 	go client.clientListenTest(logger, t)
 	select {
 	case m := <- logger:
 		cmd := m.Command
-		names := m.Content.(model.UpdateMembers).UserNames
 		if cmd != model.WSCmdUpdateMembers {
 			t.Fatalf("Failed to receive a proper message.")
 		}
+		names := m.Content.(model.UpdateMembers).UserNames
 		if names[0] != "test" {
 			t.Fatalf("Failed to receive a proper message.\nnames: %v\n", names)
 		}
@@ -73,7 +73,75 @@ func TestEnterRoom(t *testing.T) {
 	client.left.Store(true)
 }
 
-func (client *client) clientListenTest(logger chan<- model.WSMessageToSend, t *testing.T) {
+// 複数のクライアントが正しく入室できるかどうかをテストする．
+// "test0"のチャンネルを見て正しい返答が得られているかを確認する．
+func TestEnterRoomMultiple(t *testing.T) {
+	roomId := CreateRoom(model.UserID(0))
+	room, _ := ra.getRoom(roomId)
+	defer func() {
+		room.closer <- true
+	}()
+
+	numClients := 5
+	clients := make([]client, 0, numClients)
+	var logger <-chan *model.WSMessageToSend
+	for i := 0; i < numClients; i++ {
+		userId := model.UserID(i)
+		name := fmt.Sprintf("test%d", i)
+		clientReceiver, ok := ra.clientEnterRoom(
+			roomId,
+			userId,
+			name,
+			nil,
+		)
+		if (!ok) {
+			t.Fatal("Failed to enter room.")
+		}
+	
+		clients = append(clients, newClient(
+			userId,
+			name,
+			nil,
+			nil,
+			clientReceiver,
+		))
+		_logger := make(chan *model.WSMessageToSend, numClients)
+		go clients[i].clientListenTest(_logger, t)
+		if i == 0 {
+			logger = _logger
+		}
+		time.Sleep(time.Millisecond)
+	}
+
+	for i := 0; i < numClients; i++ {
+		ticker := time.NewTicker(time.Second)
+		select {
+		case m := <-logger:
+			cmd := m.Command
+			if cmd != model.WSCmdUpdateMembers {
+				t.Fatalf("Failed to receive a proper message\ni: %d\n", i)
+			}
+			names := m.Content.(model.UpdateMembers).UserNames
+			if len(names) != i+1 {
+				t.Fatalf("Failed to receive a proper message: %v", names)
+			}
+			for j := 0; j < i; j++ {
+				if !contains(names, fmt.Sprintf("test%d", j)) {
+					t.Fatalf("Invalid message: not exist test%d\n", j)
+				}
+			}
+			t.Logf("test0 receive user names: %v", names)
+		case <- ticker.C:
+			t.Fatal("Failed to receive a proper message.")
+		}
+	}
+
+	for _, client := range clients {
+		client.left.Store(true)
+	}
+}
+
+func (client *client) clientListenTest(logger chan<- *model.WSMessageToSend, t *testing.T) {
 	for {
 		if client.left.Load() {
 			return
@@ -84,7 +152,7 @@ func (client *client) clientListenTest(logger chan<- model.WSMessageToSend, t *t
 			case CmdUsersInRoom:
 				userNames := m.Content.(UsersInRoom)
 				t.Logf("userNames: %v\n", userNames)
-				logger <- model.WSMessageToSend{
+				logger <- &model.WSMessageToSend{
 					Command: model.WSCmdUpdateMembers,
 					Content: model.UpdateMembers{UserNames: userNames},
 				}
@@ -94,4 +162,13 @@ func (client *client) clientListenTest(logger chan<- model.WSMessageToSend, t *t
 		default:
 		}
 	}
+}
+
+func contains[T comparable](xs []T, x T) bool {
+	for _, xi := range xs {
+		if x == xi {
+			return true
+		}
+	}
+	return false
 }
