@@ -38,6 +38,7 @@ func NewRoom(roomId RoomID, userId UserID) Room {
 		host:       userId,
 		subscriber: make(chan *enteredClient, 1),
 		clients:    map[UserID]roomClient{},
+		closer:     make(chan bool, 1),
 	}
 }
 
@@ -114,8 +115,8 @@ func (r *Room) broadCast(m *RoomMessage) {
 	}
 }
 
-func (r *Room) userNames() []string {
-	names := make([]string, len(r.clients))
+func (r *Room) userNames() UsersInRoom {
+	names := make([]string, 0, len(r.clients))
 	for _, client := range r.clients {
 		names = append(names, client.name)
 	}
