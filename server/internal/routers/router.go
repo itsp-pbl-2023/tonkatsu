@@ -32,7 +32,7 @@ func InitRouter() *gin.Engine {
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
 	r.POST("/room", api.Session, api.CreateRoom)
-	r.POST("/chatgpt", api.ChatGPT)
+	r.POST("/chatgpt", api.Session, api.ChatGPT)
 
 	return r
 }
