@@ -11,4 +11,4 @@ jobs:
       - name: check directory
         run: pwd
       - name: check format
-        run: gofmt -l -d .
+        run: gofmt -l -d $(pwd)/server
