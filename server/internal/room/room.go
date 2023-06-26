@@ -48,11 +48,6 @@ func (r *Room) run() {
 		select {
 		case c := <-r.subscriber:
 			r.subscribe(c.id, c.name, c.receiver, c.sender)
-			names := r.userNames()
-			r.broadCast(&RoomMessage{
-				Command: CmdUsersInRoom,
-				Content: names,
-			})
 		case <-r.closer:
 			return
 		default:
@@ -61,21 +56,25 @@ func (r *Room) run() {
 		for _, client := range r.clients {
 			select {
 			case m := <-client.receiver:
-				switch m.Command {
-				case CmdLeaveRoom:
-					user := m.Content.(UserID)
-					r.cancelSubscribe(user)
-					names := r.userNames()
-					r.broadCast(&RoomMessage{
-						Command: CmdUsersInRoom,
-						Content: names,
-					})
-				default:
-					// todo
-				}
+				r.handleMessages(m)
 			default:
 			}
 		}
+	}
+}
+
+func (r *Room) handleMessages(m *ClientMessage) {
+	switch m.Command {
+	case CmdLeaveRoom:
+		user := m.Content.(UserID)
+		r.cancelSubscribe(user)
+		names := r.userNames()
+		r.broadCast(&RoomMessage{
+			Command: CmdUsersInRoom,
+			Content: names,
+		})
+	default:
+
 	}
 }
 
@@ -103,6 +102,11 @@ func (r *Room) subscribe(
 		sender:   sender,
 	}
 	r.clients[id] = client
+	names := r.userNames()
+	r.broadCast(&RoomMessage{
+		Command: CmdUsersInRoom,
+		Content: names,
+	})
 }
 
 func (r *Room) cancelSubscribe(id UserID) {
