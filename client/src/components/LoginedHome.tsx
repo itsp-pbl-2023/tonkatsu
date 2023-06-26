@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useCookies } from "react-cookie";
 import { ErrorMessage } from "@hookform/error-message";
 import { useDispatch } from "react-redux";
 import { becomeOwner, createRoom } from "../app/user/userSlice";
@@ -14,6 +15,7 @@ export const LoginedHome = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [cookies, setCookie, removeCookie] = useCookies(["userID"]);
 
   const {
     handleSubmit,
@@ -57,6 +59,10 @@ export const LoginedHome = () => {
     navigate("/standby");
   };
 
+  const logout = () => {
+    removeCookie("userID");
+  };
+
   return (
     <>
       <StyledForm>
@@ -90,6 +96,10 @@ export const LoginedHome = () => {
         </form>
         <div>
           <StyledButton onClick={createButton}>部屋を作成</StyledButton>
+        </div>
+        <StyledHr></StyledHr>
+        <div>
+          <StyledButton onClick={logout}>ログアウト</StyledButton>
         </div>
       </StyledForm>
     </>
@@ -144,7 +154,7 @@ const StyledErrorMessage = styled.div`
   font-size: 14px;
 `;
 
-// Reduxで部屋作成者かを判断
-// submithandlerの仕様
-// POST,GET
-// リロードするとオーナー情報が初期化される
+const StyledHr = styled.hr`
+  border-color: #646cff;
+  width: 360px;
+`;
