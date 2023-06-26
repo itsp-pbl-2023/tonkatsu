@@ -73,93 +73,99 @@ export const LoginForm: FC<Props> = (props) => {
 
   return (
     <>
-      <StyledForm>
-        {props.isLogin ? <h2>ログイン</h2> : <h2>新規登録</h2>}
-        <form
-          action={props.isLogin ? "/" : "/account"}
-          method="GET"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div>
+      <StyledPage>
+        <StyledForm>
+          {props.isLogin ? <h2>ログイン</h2> : <h2>新規登録</h2>}
+          <form
+            action={props.isLogin ? "/" : "/account"}
+            method="GET"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div>
-              <StyledInput
-                id="userID"
-                type="text"
-                placeholder="userID"
-                {...register("userName", {
-                  required: "ユーザーIDを入力してください",
-                  maxLength: {
-                    value: 20,
-                    message: "20文字以内で入力してください",
-                  },
-                  pattern: {
-                    value: /^[A-Za-z0-9-]+$/i,
-                    message: "ユーザーIDの形式が不正です",
-                  },
-                })}
-              />
+              <div>
+                <StyledInput
+                  id="userID"
+                  type="text"
+                  placeholder="userID"
+                  {...register("userName", {
+                    required: "ユーザーIDを入力してください",
+                    maxLength: {
+                      value: 20,
+                      message: "20文字以内で入力してください",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9-]+$/i,
+                      message: "ユーザーIDの形式が不正です",
+                    },
+                  })}
+                />
+              </div>
+              <StyledErrorMessage>
+                <ErrorMessage
+                  errors={errors}
+                  name="userName"
+                  render={({ message }) => <span>{message}</span>}
+                />
+              </StyledErrorMessage>
+              <div>
+                <StyledInput
+                  id="password"
+                  type="password"
+                  placeholder="password"
+                  role="password"
+                  {...register("password", {
+                    required: "パスワードを入力してください",
+                    maxLength: {
+                      value: 20,
+                      message: "20文字以内で入力してください",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9]+$/i,
+                      message: "パスワードの形式が不正です",
+                    },
+                  })}
+                />
+              </div>
+              <StyledErrorMessage>
+                <ErrorMessage
+                  errors={errors}
+                  name="password"
+                  render={({ message }) => <span>{message}</span>}
+                />
+              </StyledErrorMessage>
+              <StyledButton type="submit">
+                {props.isLogin ? "ログイン" : "新規登録"}
+              </StyledButton>
+              <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
             </div>
-            <StyledErrorMessage>
-              <ErrorMessage
-                errors={errors}
-                name="userName"
-                render={({ message }) => <span>{message}</span>}
-              />
-            </StyledErrorMessage>
-            <div>
-              <StyledInput
-                id="password"
-                type="password"
-                placeholder="password"
-                role="password"
-                {...register("password", {
-                  required: "パスワードを入力してください",
-                  maxLength: {
-                    value: 20,
-                    message: "20文字以内で入力してください",
-                  },
-                  pattern: {
-                    value: /^[A-Za-z0-9]+$/i,
-                    message: "パスワードの形式が不正です",
-                  },
-                })}
-              />
-            </div>
-            <StyledErrorMessage>
-              <ErrorMessage
-                errors={errors}
-                name="password"
-                render={({ message }) => <span>{message}</span>}
-              />
-            </StyledErrorMessage>
-            <StyledButton type="submit">
-              {props.isLogin ? "ログイン" : "新規登録"}
-            </StyledButton>
-            <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
-          </div>
-        </form>
-        {props.isLogin ? (
-          <StyledMessage>
-            新規登録は<Link to={`/account/`}>こちら</Link>
-          </StyledMessage>
-        ) : (
-          <StyledMessage>
-            ログインは<Link to={`/Login/`}>こちら</Link>
-          </StyledMessage>
-        )}
-      </StyledForm>
+          </form>
+          {props.isLogin ? (
+            <StyledMessage>
+              新規登録は<Link to={`/account/`}>こちら</Link>
+            </StyledMessage>
+          ) : (
+            <StyledMessage>
+              ログインは<Link to={`/Login/`}>こちら</Link>
+            </StyledMessage>
+          )}
+        </StyledForm>
+      </StyledPage>
     </>
   );
 };
 
 export default LoginForm;
 
+const StyledPage = styled.div`
+  padding: 100px 0px;
+`;
+
 const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
   background: #ffffff;
-  max-width: 360px;
+  width: 500px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;

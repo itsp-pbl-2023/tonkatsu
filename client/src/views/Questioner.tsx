@@ -87,80 +87,86 @@ const Questioner = () => {
 
   return (
     <>
-      {isSubmitted ? (
-        <StyledScreen>
-          <VStack>
+      <StyledPage>
+        {isSubmitted ? (
+          <StyledScreen>
+            <VStack>
+              <p>質問：{question}</p>
+              <p>送信した回答：{answer}</p>
+            </VStack>
+            <VStack alignItems="left" p="20px" spacing="40px">
+              {players.map((player, i) => (
+                <HStack key={i}>
+                  <p>{player}:</p>
+                  {isAnswered[i] ? (
+                    <>
+                      <StyledAnswer>正解！</StyledAnswer>
+                    </>
+                  ) : (
+                    <>
+                      <StyledAnswer>{answers[i]}</StyledAnswer>
+                      <StyledQuizButton
+                        onClick={() => judge(true, i)}
+                        isCorrect={true}
+                      >
+                        o
+                      </StyledQuizButton>
+                      <StyledQuizButton
+                        onClick={() => judge(false, i)}
+                        isCorrect={false}
+                      >
+                        x
+                      </StyledQuizButton>
+                    </>
+                  )}
+                </HStack>
+              ))}
+            </VStack>
+          </StyledScreen>
+        ) : (
+          <StyledForm>
             <p>質問：{question}</p>
-            <p>送信した回答：{answer}</p>
-          </VStack>
-          <VStack alignItems="left" p="20px" spacing="40px">
-            {players.map((player, i) => (
-              <HStack key={i}>
-                <p>{player}:</p>
-                {isAnswered[i] ? (
-                  <>
-                    <StyledAnswer>正解！</StyledAnswer>
-                  </>
-                ) : (
-                  <>
-                    <StyledAnswer>{answers[i]}</StyledAnswer>
-                    <StyledQuizButton
-                      onClick={() => judge(true, i)}
-                      isCorrect={true}
-                    >
-                      o
-                    </StyledQuizButton>
-                    <StyledQuizButton
-                      onClick={() => judge(false, i)}
-                      isCorrect={false}
-                    >
-                      x
-                    </StyledQuizButton>
-                  </>
-                )}
-              </HStack>
-            ))}
-          </VStack>
-        </StyledScreen>
-      ) : (
-        <StyledForm>
-          <p>質問：{question}</p>
-          <form action="/" method="GET" onSubmit={handleSubmit(onSubmit)}>
-            <div>
+            <form action="/" method="GET" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <StyledInput
-                  id="answer"
-                  type="text"
-                  {...register("answer", {
-                    required: "解答を入力してください",
-                    maxLength: {
-                      value: 30,
-                      message: "30文字以内で入力してください",
-                    },
-                    pattern: {
-                      value: /^[A-Za-z0-9ぁ-んーァ-ヶーｱ-ﾝﾞﾟ一-龠]+$/i,
-                      message: "入力の形式が不正です",
-                    },
-                  })}
-                />
+                <div>
+                  <StyledInput
+                    id="answer"
+                    type="text"
+                    {...register("answer", {
+                      required: "解答を入力してください",
+                      maxLength: {
+                        value: 30,
+                        message: "30文字以内で入力してください",
+                      },
+                      pattern: {
+                        value: /^[A-Za-z0-9ぁ-んーァ-ヶーｱ-ﾝﾞﾟ一-龠]+$/i,
+                        message: "入力の形式が不正です",
+                      },
+                    })}
+                  />
+                </div>
+                <StyledErrorMessage>
+                  <ErrorMessage
+                    errors={errors}
+                    name="answer"
+                    render={({ message }) => <span>{message}</span>}
+                  />
+                </StyledErrorMessage>
+                <StyledButton type="submit">送信</StyledButton>
               </div>
-              <StyledErrorMessage>
-                <ErrorMessage
-                  errors={errors}
-                  name="answer"
-                  render={({ message }) => <span>{message}</span>}
-                />
-              </StyledErrorMessage>
-              <StyledButton type="submit">送信</StyledButton>
-            </div>
-          </form>
-        </StyledForm>
-      )}
+            </form>
+          </StyledForm>
+        )}
+      </StyledPage>
     </>
   );
 };
 
 export default Questioner;
+
+const StyledPage = styled.div`
+  padding: 50px 0px;
+`;
 
 const StyledForm = styled.div`
   border-radius: 20px;

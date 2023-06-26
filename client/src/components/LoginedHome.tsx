@@ -65,53 +65,60 @@ export const LoginedHome = () => {
 
   return (
     <>
-      <StyledForm>
-        <form onSubmit={handleSubmit(joinButton)}>
+      <StyledPage>
+        <p>userID : {cookies.userID}</p>
+        <StyledForm>
+          <form onSubmit={handleSubmit(joinButton)}>
+            <div>
+              <StyledInput
+                type="text"
+                placeholder="6桁の部屋ID"
+                {...register("id", {
+                  required: "部屋IDを入力してください",
+                  maxLength: {
+                    value: 6,
+                    message: "6桁で入力してください",
+                  },
+                  pattern: {
+                    value: /^[0-9-]+$/i,
+                    message: "部屋IDの形式が不正です",
+                  },
+                })}
+              />
+            </div>
+            <StyledErrorMessage>
+              <ErrorMessage
+                errors={errors}
+                name="id"
+                render={({ message }) => <span>{message}</span>}
+              />
+            </StyledErrorMessage>
+            <StyledButton type="submit">部屋IDで参加</StyledButton>
+            <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
+          </form>
           <div>
-            <StyledInput
-              type="text"
-              placeholder="6桁の部屋ID"
-              {...register("id", {
-                required: "部屋IDを入力してください",
-                maxLength: {
-                  value: 6,
-                  message: "6桁で入力してください",
-                },
-                pattern: {
-                  value: /^[0-9-]+$/i,
-                  message: "部屋IDの形式が不正です",
-                },
-              })}
-            />
+            <StyledButton onClick={createButton}>部屋を作成</StyledButton>
           </div>
-          <StyledErrorMessage>
-            <ErrorMessage
-              errors={errors}
-              name="id"
-              render={({ message }) => <span>{message}</span>}
-            />
-          </StyledErrorMessage>
-          <StyledButton type="submit">部屋IDで参加</StyledButton>
-          <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
-        </form>
-        <div>
-          <StyledButton onClick={createButton}>部屋を作成</StyledButton>
-        </div>
-        <StyledHr></StyledHr>
-        <div>
-          <StyledButton onClick={logout}>ログアウト</StyledButton>
-        </div>
-      </StyledForm>
+          <StyledHr></StyledHr>
+          <div>
+            <StyledButton onClick={logout}>ログアウト</StyledButton>
+          </div>
+        </StyledForm>
+      </StyledPage>
     </>
   );
 };
+
+const StyledPage = styled.div`
+  padding: 100px 0px;
+`;
 
 const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
   background: #ffffff;
-  max-width: 360px;
+  width: 500px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
@@ -145,7 +152,7 @@ const StyledInput = styled.input`
   padding: 8px 16px;
   margin: 10px;
   width: 80%;
-  height: 20px;
+  height: 40px;
   font-size: 1em;
 `;
 
@@ -156,5 +163,5 @@ const StyledErrorMessage = styled.div`
 
 const StyledHr = styled.hr`
   border-color: #646cff;
-  width: 360px;
+  width: 400px;
 `;

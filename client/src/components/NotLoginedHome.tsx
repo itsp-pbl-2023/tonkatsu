@@ -14,24 +14,30 @@ export const NotLoginedHome = () => {
 
   return (
     <>
-      <StyledForm>
-        <div>
+      <StyledPage>
+        <StyledForm>
+          <div>
             <StyledButton onClick={handleClickLogin}>ログイン</StyledButton>
-        </div>
-        <div>
+          </div>
+          <div>
             <StyledButton onClick={handleClickRegister}>新規登録</StyledButton>
-        </div>
-      </StyledForm>
+          </div>
+        </StyledForm>
+      </StyledPage>
     </>
   );
 };
+
+const StyledPage = styled.div`
+  padding: 100px 0px;
+`;
 
 const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  background: #FFFFFF;
-  max-width: 360px;
+  background: #ffffff;
+  width: 500px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
@@ -50,11 +56,11 @@ const StyledButton = styled.button`
   background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
-&:hover {
-  border-color: #646cff;
-}
-&:focus,
-&:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  &:hover {
+    border-color: #646cff;
+  }
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 `;
