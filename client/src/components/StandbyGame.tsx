@@ -9,8 +9,9 @@ export const StandbyGame = function() {
 	const roomid = useSelector((state: any) => state.user.roomId);
   const isOwner = useSelector((state: any) => state.user.isOwner);
   const socketRef = React.useRef<WebSocket>();
-  const [userNames, setUserNames] = useState(["hello", "user", "name"]);
+  const [userNames, setUserNames] = useState([]);
 	const navigate = useNavigate();
+	var flag = 0;
 
 	// status:
 	// 0: WebSocket 接続前
@@ -24,27 +25,31 @@ export const StandbyGame = function() {
 
   // WebSocket
   useEffect(() => {
-		var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid);
-    socketRef.current = socket;
+		if (flag == 0) {
+			flag = 1;
+			console.log('Hello Socket');
+			var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid);
+			socketRef.current = socket;
 
-    // ソケットエラー
-		socket.onerror = function() {
-      setStatus(1);
-		};
+			// ソケットエラー
+			socket.onerror = function() {
+				setStatus(1);
+			};
 
-    // サーバーからのソケット受け取り
-		socket.onmessage = function (event) {
-			var msg = JSON.parse(event.data);
-      switch(msg['command']) {
-      case 'update_members':
-        setUserNames(msg['command']['user_name'])
-				break
-			case 'start_game':
-				moveGame()
-				break
-      }
-      setStatus(2);
-		};
+			// サーバーからのソケット受け取り
+			socket.onmessage = function (event) {
+				var msg = JSON.parse(event.data);
+				switch(msg['command']) {
+				case 'update_members':
+					setUserNames(msg['content']['user_name'])
+					break
+				case 'start_game':
+					moveGame()
+					break
+				}
+				setStatus(2);
+			};
+		}
   },[])
 
 	const moveGame = function() {
@@ -66,6 +71,8 @@ export const StandbyGame = function() {
     // 部屋を抜けるとき
     var sendJson = {"command": "leave"};
     socketRef.current?.send(JSON.stringify(sendJson));
+		socketRef.current?.close();
+		navigate("/");
   }
 
 	const backHome = function() {
@@ -117,6 +124,11 @@ export const StandbyGame = function() {
           <div>
             <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
           </div>
+					<StyledHr></StyledHr>
+					<h2>参加者</h2>
+					<div>
+						{userList}
+					</div>
         </StyledPage>
       </>
     );
@@ -134,6 +146,11 @@ export const StandbyGame = function() {
         <div>
           <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
         </div>
+				<StyledHr></StyledHr>
+				<h2>参加者</h2>
+				<div>
+					{userList}
+				</div>
       </StyledPage>
     </>
   );
