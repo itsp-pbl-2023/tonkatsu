@@ -17,7 +17,7 @@ func InitRouter() *gin.Engine {
 			"http://localhost:5173",
 			"https://itsp-pbl-2023.github.io", // Swagger UI on GitHub Pages
 		},
-		AllowMethods:    []string{"OPTIONS", "GET", "POST", "PUT", "DELETE"},
+		AllowMethods: []string{"OPTIONS", "GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{
 			"Origin",
 			"Content-type",

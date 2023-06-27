@@ -51,7 +51,7 @@ func ConnectWS(ctx *gin.Context) {
 	var userNames UsersInRoom
 	// maxWait * waitMiliSec ms だけRoomからの応答を待つ.
 	// 応答がなければRoomが閉じたと判断し終了.
-	wait:
+wait:
 	for t, maxWait, waitMiliSec := 0, 10, 100*time.Millisecond; true; t += 1 {
 		select {
 		case m := <-clientReceiver:

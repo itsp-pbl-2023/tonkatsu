@@ -7,7 +7,6 @@ import (
 	"tonkatsu-server/internal/model"
 )
 
-
 func TestCreateRoom(t *testing.T) {
 	userId := model.UserID(1)
 	roomId := CreateRoom(userId)
@@ -42,7 +41,7 @@ func TestEnterRoom(t *testing.T) {
 		name,
 		nil,
 	)
-	if (!ok) {
+	if !ok {
 		t.Fatal("Failed to enter room.")
 	}
 
@@ -58,7 +57,7 @@ func TestEnterRoom(t *testing.T) {
 	ticker := time.NewTicker(time.Second)
 	go client.clientListenTest(logger, t)
 	select {
-	case m := <- logger:
+	case m := <-logger:
 		cmd := m.Command
 		if cmd != model.WSCmdUpdateMembers {
 			t.Fatalf("Failed to receive a proper message.")
@@ -67,7 +66,7 @@ func TestEnterRoom(t *testing.T) {
 		if names[0] != "test" {
 			t.Fatalf("Failed to receive a proper message.\nnames: %v\n", names)
 		}
-	case <- ticker.C:
+	case <-ticker.C:
 		t.Fatal("Failed to receive messages.")
 	}
 	client.left.Store(true)
@@ -94,10 +93,10 @@ func TestEnterRoomMultiple(t *testing.T) {
 			name,
 			nil,
 		)
-		if (!ok) {
+		if !ok {
 			t.Fatal("Failed to enter room.")
 		}
-	
+
 		clients = append(clients, newClient(
 			userId,
 			name,
@@ -131,7 +130,7 @@ func TestEnterRoomMultiple(t *testing.T) {
 				}
 			}
 			t.Logf("test0 receive user names: %v", names)
-		case <- ticker.C:
+		case <-ticker.C:
 			t.Fatal("Failed to receive a proper message.")
 		}
 	}
@@ -147,7 +146,7 @@ func (client *client) clientListenTest(logger chan<- *model.WSMessageToSend, t *
 			return
 		}
 		select {
-		case m := <-client.receiver: 
+		case m := <-client.receiver:
 			switch m.Command {
 			case CmdUsersInRoom:
 				userNames := m.Content.(UsersInRoom)
