@@ -41,7 +41,7 @@ type Usage struct {
 }
 
 func CallChatGPT(message string) string {
-	apiKey := "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" // SET YOUR API KEY
+	apiKey := "YOUR_API_KEY" // SET YOUR API KEY
 	var messages []Message
 	messages = append(messages, Message{
 		Role:    "user",
