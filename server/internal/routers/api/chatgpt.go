@@ -13,7 +13,7 @@ type POSTChatGPT struct {
 }
 
 type response struct {
-	Message string `json:"message"`
+	Messages []string `json:"message"`
 }
 
 func ChatGPT(ctx *gin.Context) {
@@ -23,8 +23,8 @@ func ChatGPT(ctx *gin.Context) {
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 	}
-	fmt.Printf("request:%v", request)
-	response.Message = chatgpt.CallChatGPT(request.Message)
+	fmt.Printf("request:%v\n", request)
+	response.Messages = chatgpt.AskChatGPT(request.Message)
 
 	ctx.JSON(http.StatusOK, response)
 }

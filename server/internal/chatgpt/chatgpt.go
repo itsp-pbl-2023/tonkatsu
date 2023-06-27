@@ -6,6 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 type OpenaiRequest struct {
@@ -39,7 +41,7 @@ type Usage struct {
 }
 
 func CallChatGPT(message string) string {
-	apiKey := "YOUR_API_KEY" // SET YOUR API KEY
+	apiKey := "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" // SET YOUR API KEY
 	var messages []Message
 	messages = append(messages, Message{
 		Role:    "user",
@@ -91,4 +93,33 @@ func CallChatGPT(message string) string {
 	})
 
 	return response.Choices[0].Messages.Content
+}
+
+func AskChatGPT(keyword string) []string {
+	prompt := "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。極めて抽象的に記述してください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+	prompt = strings.Replace(prompt, "[[KEYWORD]]", keyword, -1)
+	response := CallChatGPT(prompt)
+
+	response = MaskKeyword(response, keyword)
+	response_slice := SplitMessage(response)
+	return response_slice
+}
+
+func SplitMessage(message string) []string {
+	reg := "[\n]"
+
+	// 正規表現で文字列をスプリット
+	message_slice := regexp.MustCompile(reg).Split(message, -1)
+	var refined_slice []string
+	for _, v := range message_slice {
+		if v != "" {
+			refined_slice = append(refined_slice, v)
+		}
+	}
+
+	return refined_slice
+}
+
+func MaskKeyword(message string, keyword string) string {
+	return strings.Replace(message, keyword, "[[MASK]]", -1)
 }
