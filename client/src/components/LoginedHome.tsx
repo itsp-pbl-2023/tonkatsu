@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useDispatch, useSelector } from "react-redux";
-import { becomeOwner } from "../app/user/userSlice";
+import { becomeOwner, createroom } from "../app/user/userSlice";
 import styled from "styled-components";
 
 type RoomId = {
@@ -24,8 +24,14 @@ export const LoginedHome = () => {
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<RoomId> = () => {
+  const onSubmit: SubmitHandler<RoomId> = (data) => {
+    roomSuccess(false, data.id)
+    reset();
+  };
+
+  const onClick = () => {
     const xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.withCredentials = true
     let url = "http://localhost:8000/room";
     xmlHttpRequest.open("POST", url);
     xmlHttpRequest.send();
@@ -33,24 +39,24 @@ export const LoginedHome = () => {
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
         if (xmlHttpRequest.status == 201) {
-          roomSuccess(false);
+          let { roomId } = JSON.parse(xmlHttpRequest.responseText)
+          roomSuccess(true, roomId);
         } else {
           // if (xmlHttpRequest.status == 500) {
           roomError();
         }
       }
     };
-
-    reset();
-  };
+  }
 
   const roomId = useSelector((state: any) => state.user.roomId);
   const dispatch = useDispatch();
 
-  const roomSuccess = (isOwner: boolean) => {
+  const roomSuccess = (isOwner: boolean, roomId: string) => {
     if (isOwner) {
       dispatch(becomeOwner());
     }
+    dispatch(createroom(roomId))
     navigate("/standby");
   };
 
@@ -61,7 +67,7 @@ export const LoginedHome = () => {
   return (
     <>
       <StyledForm>
-        <form action={"/"} method="GET" onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <StyledInput
               id="roomID"
@@ -91,7 +97,7 @@ export const LoginedHome = () => {
           <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
         </form>
         <div>
-          <StyledButton onClick={() => roomSuccess(true)}>
+          <StyledButton onClick={onClick}>
             部屋を作成
           </StyledButton>
         </div>

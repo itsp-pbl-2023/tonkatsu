@@ -20,6 +20,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { becomeOwner } = userSlice.actions;
+export const { becomeOwner, createroom } = userSlice.actions;
 
 export default userSlice.reducer;

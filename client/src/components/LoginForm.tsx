@@ -31,6 +31,7 @@ export const LoginForm: FC<Props> = props => {
     console.log(data.userName);
     console.log(data.password);
     const xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.withCredentials = true
     let url;
     if (props.isLogin) {
       url = 'http://localhost:8000/login';
