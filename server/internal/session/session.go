@@ -44,7 +44,7 @@ func CreateSesison(ctx *gin.Context, id UserID) error {
 }
 
 // ConfirmSession は, Cookieを見てセッションが確立しているかを確認する.
-// `ctx`に`userID`を保存する. 
+// `ctx`に`userID`を保存する.
 func ConfirmSession(ctx *gin.Context) bool {
 	sid, err := ctx.Cookie(sCookieName)
 	if err != nil {
@@ -73,7 +73,6 @@ func GetUserId(ctx *gin.Context) (UserID, bool) {
 		return id.(UserID), true
 	}
 }
-
 
 func UpdateSession(ctx *gin.Context) error {
 	sessionID, err := ctx.Cookie(sCookieName)

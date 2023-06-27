@@ -10,7 +10,7 @@ type RoomMessage struct {
 type RoomMsgCommand int
 
 const (
-	// 部屋にいるユーザー  
+	// 部屋にいるユーザー
 	// Content: UsersInRoom
 	CmdUsersInRoom = RoomMsgCommand(iota)
 	// 部屋を閉じる

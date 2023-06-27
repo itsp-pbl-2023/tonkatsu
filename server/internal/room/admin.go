@@ -78,9 +78,9 @@ func (ra *RoomAdmin) clientEnterRoom(
 func (ra *RoomAdmin) generateRoomId() RoomID {
 	n := 6
 	max := int32(math.Pow10(n) - 1)
-	min := int32(math.Pow10(n-1))
+	min := int32(math.Pow10(n - 1))
 	for {
-		id := RoomID(strconv.Itoa(int(min + rand.Int31n(max - min + 1))))
+		id := RoomID(strconv.Itoa(int(min + rand.Int31n(max-min+1))))
 		if !ra.existsRoom(id) {
 			return id
 		}

@@ -95,7 +95,7 @@ func (r *Room) subscribe(
 	name string,
 	receiver <-chan *ClientMessage,
 	sender chan<- *RoomMessage,
- ) {
+) {
 	client := roomClient{
 		name:     name,
 		receiver: receiver,

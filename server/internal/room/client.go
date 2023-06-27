@@ -15,7 +15,7 @@ type client struct {
 	conn     *websocket.Conn
 	sender   chan<- *ClientMessage
 	receiver <-chan *RoomMessage
-	left    atomic.Bool
+	left     atomic.Bool
 }
 
 func newClient(
@@ -31,7 +31,7 @@ func newClient(
 		conn:     conn,
 		sender:   sender,
 		receiver: receiver,
-		left:    atomic.Bool{},
+		left:     atomic.Bool{},
 	}
 	new.left.Store(false)
 	return new
@@ -65,8 +65,8 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 		if err != nil {
 			return
 		}
-		
-		switch message.Command{
+
+		switch message.Command {
 		case model.WSCmdLeave:
 			return
 		}
