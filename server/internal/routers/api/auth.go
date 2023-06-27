@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type Auth struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
@@ -61,13 +60,17 @@ func Login(ctx *gin.Context) {
 func Session(ctx *gin.Context) {
 	ok := session.ConfirmSession(ctx)
 	if !ok {
+		fmt.Fprintln(os.Stderr, "Not Logged In")
 		ctx.Status(http.StatusUnauthorized)
+		ctx.Abort()
 		return
 	}
 
 	err := session.UpdateSession(ctx)
 	if err != nil {
-		ctx.Status(http.StatusNotImplemented)
+		fmt.Fprintln(os.Stderr, err)
+		ctx.Status(http.StatusInternalServerError)
+		ctx.Abort()
 		return
 	}
 

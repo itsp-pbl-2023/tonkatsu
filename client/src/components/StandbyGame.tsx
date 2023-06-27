@@ -71,6 +71,7 @@ export const StandbyGame = function() {
     );
   }
 
+
   // 部屋が見つからないとき
   if (status == 1) {
 		return (
