@@ -76,7 +76,10 @@ export const StandbyGame = function() {
   if (status == 0) {
     return (
       <>
-        <h3>部屋を検索中...</h3>
+        <StyledPage>
+          {" "}
+          <h3>部屋を検索中...</h3>
+        </StyledPage>
       </>
     );
   }
@@ -85,10 +88,12 @@ export const StandbyGame = function() {
   if (status == 1) {
 		return (
       <>
-        <h3>部屋が見つかりませんでした</h3>
-				<div>
-          <StyledButton onClick={backHome}>戻る</StyledButton>
-        </div>
+        <StyledPage>
+          <h3>部屋が見つかりませんでした</h3>
+          <div>
+            <StyledButton onClick={backHome}>戻る</StyledButton>
+          </div>
+        </StyledPage>
       </>
     );
   }
@@ -102,19 +107,16 @@ export const StandbyGame = function() {
   if (localStorage.getItem("isOwner") == "true") {
     return (
       <>
-        <h2>部屋 ID</h2>
-        <h1>{roomid}</h1>
-        <div>
-          <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
-        </div>
-        <div>
-          <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
-        </div>
-        <StyledHr></StyledHr>
-        <h2>参加者</h2>
-        <div>
-          {userList}
-        </div>
+        <StyledPage>
+          <h2>部屋 ID</h2>
+          <h1>{roomid}</h1>
+          <div>
+            <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
+          </div>
+          <div>
+            <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
+          </div>
+        </StyledPage>
       </>
     );
   }
@@ -122,19 +124,16 @@ export const StandbyGame = function() {
   // オーナーじゃない
   return (
     <>
-      <h2>部屋 ID</h2>
-      <h1>{roomid}</h1>
-      <div>
-        <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
-      </div>
-      <div>
-        <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
-      </div>
-      <StyledHr></StyledHr>
-      <h2>参加者</h2>
-      <div>
-        {userList}
-      </div>
+      <StyledPage>
+        <h2>部屋 ID</h2>
+        <h1>{roomid}</h1>
+        <div>
+          <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
+        </div>
+        <div>
+          <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
+        </div>
+      </StyledPage>
     </>
   );
 };
@@ -149,6 +148,9 @@ const StyledUser = styled.h2`
   padding: 0;
   margin: 0;
   font-weight: 500;
+`;
+const StyledPage = styled.div`
+  padding: 100px 0px;
 `;
 
 const StyledButton = styled.button`

@@ -4,6 +4,18 @@ info:
   version: '1.0'
 servers:
   - url: http://localhost:8000
+components:
+  schemas:
+    Auth:
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+      example:
+        userName: ton
+        password: katsu
 paths:
   /account:
     post:
@@ -12,15 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userName:
-                  type: string
-                password:
-                  type: string
-              example:
-                userName: ton
-                password: katsu
+              $ref: "#/components/schemas/Auth"
       responses:
         '200':
           description: OK
@@ -33,17 +37,41 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userName:
-                  type: string
-                password:
-                  type: string
-              example:
-                userName: ton
-                password: katsu
+              $ref: "#/components/schemas/Auth"
       responses:
         '200':
           description: OK
         '401':
           description: NG
+  /room:
+    post:
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roomId:
+                    type: string
+        '500':
+          description: Server Error
+  /ws:
+    get:
+      description: Web Socketに接続する.
+      parameters:
+        - name: "roomid"
+          in: "query"
+          description: 接続するルームID
+          required: true
+          schema:
+            type: "string"
+            example: "123456"
+      responses:
+        '101':
+          description: Web Socketでの通信を開始
+        '400':
+          description: リクエストされたルームIDを持つルームが存在しない
+        '401':
+          description: セッションがない (ログインしてない)
