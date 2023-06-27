@@ -17,5 +17,5 @@ jobs:
       - name: check format
         uses: Jerome1337/gofmt-action@v1.0.5
         with:
-          gofmt-path: '/server'
-          gofmt-path: '-l -d'
+          gofmt-path: './server'
+          gofmt-flags: '-l -d'
