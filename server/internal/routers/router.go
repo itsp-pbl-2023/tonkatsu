@@ -13,7 +13,10 @@ func InitRouter() *gin.Engine {
 
 	// CORS
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"https://itsp-pbl-2023.github.io", // Swagger UI on GitHub Pages
+		},
 		AllowMethods:    []string{"OPTIONS", "GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{
 			"Origin",
@@ -28,9 +31,12 @@ func InitRouter() *gin.Engine {
 		MaxAge:          12 * time.Hour,
 	}))
 
-	r.GET("/hello_world", api.GetHelloWorld)
+	r.GET("/hello_world", api.Session, api.GetHelloWorld)
 	r.POST("/account", api.Account)
 	r.POST("/login", api.Login)
+	r.POST("/room", api.Session, api.CreateRoom)
+	r.GET("/ws", api.Session, api.WebSocket)
+	r.POST("/chatgpt", api.Session, api.ChatGPT)
 
 	return r
 }
