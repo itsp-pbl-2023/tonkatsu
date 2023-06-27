@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"tonkatsu-server/internal/room"
 	"tonkatsu-server/internal/session"
@@ -19,10 +18,9 @@ func CreateRoom(ctx *gin.Context) {
 	userID, ok := session.GetUserId(ctx)
 
 	if !ok {
-		fmt.Printf("GetUserId FAILED")
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
 	response.RoomID = room.CreateRoom(userID)
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusCreated, response)
 }

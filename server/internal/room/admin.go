@@ -1,7 +1,9 @@
 package room
 
 import (
+	"math"
 	"math/rand"
+	"strconv"
 	"sync"
 	. "tonkatsu-server/internal/model"
 )
@@ -40,6 +42,13 @@ func (ra *RoomAdmin) existsRoom(id RoomID) bool {
 	return ok
 }
 
+func (ra *RoomAdmin) getRoom(id RoomID) (*Room, bool) {
+	ra.mu.RLock()
+	room, ok := ra.rooms[id]
+	ra.mu.RUnlock()
+	return room, ok
+}
+
 // Roomへクライアントを入室させるメッセージを送る.
 // Room->Client　のchannelを返す.
 func (ra *RoomAdmin) clientEnterRoom(
@@ -68,13 +77,10 @@ func (ra *RoomAdmin) clientEnterRoom(
 // すでにあるRoomIDは使わない
 func (ra *RoomAdmin) generateRoomId() RoomID {
 	n := 6
-	s := make([]byte, n, n)
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	max := int32(math.Pow10(n) - 1)
+	min := int32(math.Pow10(n-1))
 	for {
-		for i := range s {
-			s[i] = letters[rand.Intn(len(letters))]
-		}
-		id := RoomID(s)
+		id := RoomID(strconv.Itoa(int(min + rand.Int31n(max - min + 1))))
 		if !ra.existsRoom(id) {
 			return id
 		}

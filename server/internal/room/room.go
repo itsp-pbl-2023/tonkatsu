@@ -13,6 +13,7 @@ type Room struct {
 	host       UserID
 	subscriber chan *enteredClient
 	clients    map[UserID]roomClient
+	closer     chan bool
 }
 
 // Roomからみたクライアント
@@ -37,6 +38,7 @@ func NewRoom(roomId RoomID, userId UserID) Room {
 		host:       userId,
 		subscriber: make(chan *enteredClient, 1),
 		clients:    map[UserID]roomClient{},
+		closer:     make(chan bool, 1),
 	}
 }
 
@@ -45,35 +47,44 @@ func (r *Room) run() {
 	for {
 		select {
 		case c := <-r.subscriber:
-			r.subscribe(c.id, c.name, c.receiver)
-			names := r.userNames()
-			r.broadCast(&RoomMessage{
-				Command: CmdUsersInRoom,
-				Content: names,
-			})
+			r.subscribe(c.id, c.name, c.receiver, c.sender)
+		case <-r.closer:
+			return
+		default:
 		}
 		// クライアントからのメッセージを処理
 		for _, client := range r.clients {
 			select {
 			case m := <-client.receiver:
-				switch m.Command {
-				case CmdLeaveRoom:
-					user := m.Content.(UserID)
-					r.cancelSubscribe(user)
-					names := r.userNames()
-					r.broadCast(&RoomMessage{
-						Command: CmdUsersInRoom,
-						Content: names,
-					})
-				default:
-					// todo
-				}
+				r.handleMessages(m)
+			default:
 			}
 		}
 	}
 }
 
+func (r *Room) handleMessages(m *ClientMessage) {
+	switch m.Command {
+	case CmdLeaveRoom:
+		user := m.Content.(UserID)
+		r.cancelSubscribe(user)
+		names := r.userNames()
+		r.broadCast(&RoomMessage{
+			Command: CmdUsersInRoom,
+			Content: names,
+		})
+	default:
+
+	}
+}
+
 func (r *Room) close() {
+	for _, client := range r.clients {
+		client.sender <- &RoomMessage{
+			Command: CmdClose,
+			Content: nil,
+		}
+	}
 	ra.deleteRoom(r.id)
 }
 
@@ -83,15 +94,19 @@ func (r *Room) subscribe(
 	id UserID,
 	name string,
 	receiver <-chan *ClientMessage,
-) <-chan *RoomMessage {
-	sender := make(chan *RoomMessage, 1)
+	sender chan<- *RoomMessage,
+ ) {
 	client := roomClient{
 		name:     name,
 		receiver: receiver,
 		sender:   sender,
 	}
 	r.clients[id] = client
-	return sender
+	names := r.userNames()
+	r.broadCast(&RoomMessage{
+		Command: CmdUsersInRoom,
+		Content: names,
+	})
 }
 
 func (r *Room) cancelSubscribe(id UserID) {
@@ -104,8 +119,8 @@ func (r *Room) broadCast(m *RoomMessage) {
 	}
 }
 
-func (r *Room) userNames() []string {
-	names := make([]string, len(r.clients))
+func (r *Room) userNames() UsersInRoom {
+	names := make([]string, 0, len(r.clients))
 	for _, client := range r.clients {
 		names = append(names, client.name)
 	}

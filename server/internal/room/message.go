@@ -3,7 +3,7 @@ package room
 // Roomが送信するメッセージ
 type RoomMessage struct {
 	Command RoomMsgCommand
-	Content any // Goには列挙型がない!
+	Content any
 }
 
 // Roomが送信するメッセージのコマンド
