@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { useCookies } from "react-cookie";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,25 +7,26 @@ import styled from "styled-components";
 
 type Props = {
   isLogin: boolean;
-}
+};
 
 type AccountData = {
   userName: string;
   password: string;
 };
 
-export const LoginForm: FC<Props> = props => {
+export const LoginForm: FC<Props> = (props) => {
   const navigate = useNavigate();
 
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [cookies, setCookie] = useCookies(["userID"]);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<AccountData>({
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<AccountData> = (data) => {
@@ -33,117 +35,137 @@ export const LoginForm: FC<Props> = props => {
     const xmlHttpRequest = new XMLHttpRequest();
     let url;
     if (props.isLogin) {
-      url = 'http://localhost:8000/login';
+      url = "http://localhost:8000/login";
+      setCookie("userID", data.userName);
     } else {
-      url = 'http://localhost:8000/account';
+      url = "http://localhost:8000/account";
     }
-    xmlHttpRequest.open('POST', url);
+    xmlHttpRequest.open("POST", url);
     let jsonData = JSON.stringify(data);
     xmlHttpRequest.send(jsonData);
 
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
         if (xmlHttpRequest.status == 200) {
-            console.log(xmlHttpRequest)
-            loginSuccess();
-        } else { // if (xmlHttpRequest.status == 401) {
-            loginErrorMsg();
+          console.log(xmlHttpRequest);
+          loginSuccess();
+        } else {
+          // if (xmlHttpRequest.status == 401) {
+          loginErrorMsg();
         }
       }
-    }
+    };
 
     reset();
-  }
+  };
 
   const loginSuccess = () => {
     navigate("/");
-  }
+  };
 
   const loginErrorMsg = () => {
-    if (!props.isLogin) { 
+    if (!props.isLogin) {
       setErrorMsg("このユーザIDは既に使われてます");
     } else {
       setErrorMsg("ユーザIDまたはパスワードが違います");
     }
-  }
+  };
 
   return (
     <>
-      <StyledForm>
-        {props.isLogin
-          ? <h2>ログイン</h2>
-          : <h2>新規登録</h2>
-        }
-        <form action={props.isLogin ? "/" : "/account"} method="GET" onSubmit={handleSubmit(onSubmit)}>
-          <div>
+      <StyledPage>
+        <StyledForm>
+          {props.isLogin ? <h2>ログイン</h2> : <h2>新規登録</h2>}
+          <form
+            action={props.isLogin ? "/" : "/account"}
+            method="GET"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div>
-              <StyledInput 
-                id = "userID"
-                type = "text"
-                placeholder = "userID"
-                {...register('userName', { 
-                  required: 'ユーザーIDを入力してください', 
-                  maxLength: {
+              <div>
+                <StyledInput
+                  id="userID"
+                  type="text"
+                  placeholder="userID"
+                  {...register("userName", {
+                    required: "ユーザーIDを入力してください",
+                    maxLength: {
                       value: 20,
-                      message: '20文字以内で入力してください'
-                  },
-                  pattern: {
-                      value:
-                          /^[A-Za-z0-9-]+$/i,
-                  message: 'ユーザーIDの形式が不正です',
-                  }, 
-                })}
-              />
-            </div>
-            <StyledErrorMessage>
-              <ErrorMessage errors={errors} name="userName" render={({message}) => <span>{message}</span>} />
-            </StyledErrorMessage>
-            <div>
-              <StyledInput
-                id = "password"
-                type = "password"
-                placeholder = "password"
-                role = "password"
-                {...register('password', { 
-                  required: 'パスワードを入力してください', 
-                  maxLength: {
+                      message: "20文字以内で入力してください",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9-]+$/i,
+                      message: "ユーザーIDの形式が不正です",
+                    },
+                  })}
+                />
+              </div>
+              <StyledErrorMessage>
+                <ErrorMessage
+                  errors={errors}
+                  name="userName"
+                  render={({ message }) => <span>{message}</span>}
+                />
+              </StyledErrorMessage>
+              <div>
+                <StyledInput
+                  id="password"
+                  type="password"
+                  placeholder="password"
+                  role="password"
+                  {...register("password", {
+                    required: "パスワードを入力してください",
+                    maxLength: {
                       value: 20,
-                      message: '20文字以内で入力してください',
-                  },
-                  pattern: {
-                      value:
-                          /^[A-Za-z0-9]+$/i,
-                  message: 'パスワードの形式が不正です',
-                  }, 
-                })} 
-              />
+                      message: "20文字以内で入力してください",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9]+$/i,
+                      message: "パスワードの形式が不正です",
+                    },
+                  })}
+                />
+              </div>
+              <StyledErrorMessage>
+                <ErrorMessage
+                  errors={errors}
+                  name="password"
+                  render={({ message }) => <span>{message}</span>}
+                />
+              </StyledErrorMessage>
+              <StyledButton type="submit">
+                {props.isLogin ? "ログイン" : "新規登録"}
+              </StyledButton>
+              <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
             </div>
-            <StyledErrorMessage>
-              <ErrorMessage errors={errors} name="password" render={({message}) => <span>{message}</span>} />
-            </StyledErrorMessage>
-            <StyledButton
-              type = "submit"
-              >{props.isLogin ? "ログイン" : "新規登録"}</StyledButton>
-            <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
-          </div>
-        </form>
-        {props.isLogin
-            ? <StyledMessage>新規登録は<Link to={`/account/`}>こちら</Link></StyledMessage>
-            : <StyledMessage>ログインは<Link to={`/Login/`}>こちら</Link></StyledMessage>
-        }
-      </StyledForm>
+          </form>
+          {props.isLogin ? (
+            <StyledMessage>
+              新規登録は<Link to={`/account/`}>こちら</Link>
+            </StyledMessage>
+          ) : (
+            <StyledMessage>
+              ログインは<Link to={`/Login/`}>こちら</Link>
+            </StyledMessage>
+          )}
+        </StyledForm>
+      </StyledPage>
     </>
   );
 };
 
 export default LoginForm;
 
+const StyledPage = styled.div`
+  padding: 100px 0px;
+`;
+
 const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  background: #FFFFFF;
-  max-width: 360px;
+  background: #ffffff;
+  width: 500px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
@@ -156,7 +178,7 @@ const StyledInput = styled.input`
   padding: 8px 16px;
   margin: 10px;
   width: 80%;
-  height: 20px;
+  height: 40px;
   font-size: 1em;
 `;
 
@@ -172,13 +194,13 @@ const StyledButton = styled.button`
   background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
-&:hover {
-  border-color: #646cff;
-}
-&:focus,
-&:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  &:hover {
+    border-color: #646cff;
+  }
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 `;
 
 const StyledMessage = styled.p`

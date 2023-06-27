@@ -38,6 +38,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Auth"
+
       responses:
         '200':
           description: OK

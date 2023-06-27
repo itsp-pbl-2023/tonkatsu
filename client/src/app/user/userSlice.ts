@@ -12,7 +12,7 @@ export const userSlice = createSlice({
     becomeOwner: (state) => {
       state.isOwner = true;
     },
-    createroom: (state, action) => {
+    createRoom: (state, action) => {
       if (action.payload !== "") {
         state.roomId = action.payload;
       }
@@ -20,6 +20,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { becomeOwner } = userSlice.actions;
+export const { becomeOwner, createRoom } = userSlice.actions;
 
 export default userSlice.reducer;
