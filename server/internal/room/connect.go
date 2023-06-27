@@ -91,7 +91,7 @@ wait:
 		clientSender,
 		clientReceiver,
 	)
-
+	fmt.Fprintln(os.Stderr, "[LOG] Success to connect via WebSocket!")
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	go client.listenWS(&wg)

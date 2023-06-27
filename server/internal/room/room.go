@@ -1,6 +1,7 @@
 package room
 
 import (
+	"tonkatsu-server/internal/model"
 	. "tonkatsu-server/internal/model"
 )
 
@@ -53,21 +54,20 @@ func (r *Room) run() {
 		default:
 		}
 		// クライアントからのメッセージを処理
-		for _, client := range r.clients {
+		for userId, client := range r.clients {
 			select {
 			case m := <-client.receiver:
-				r.handleMessages(m)
+				r.handleMessages(m, userId, client)
 			default:
 			}
 		}
 	}
 }
 
-func (r *Room) handleMessages(m *ClientMessage) {
+func (r *Room) handleMessages(m *ClientMessage, userId model.UserID, client roomClient) {
 	switch m.Command {
 	case CmdLeaveRoom:
-		user := m.Content.(UserID)
-		r.cancelSubscribe(user)
+		r.cancelSubscribe(userId)
 		names := r.userNames()
 		r.broadCast(&RoomMessage{
 			Command: CmdUsersInRoom,
