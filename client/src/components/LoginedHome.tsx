@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useCookies } from "react-cookie";
 import { ErrorMessage } from "@hookform/error-message";
-import { useDispatch, useSelector } from "react-redux";
-import { becomeOwner, createroom } from "../app/user/userSlice";
+import { useDispatch } from "react-redux";
+import { becomeOwner, createRoom } from "../app/user/userSlice";
 import styled from "styled-components";
 
 type RoomId = {
@@ -11,25 +12,32 @@ type RoomId = {
 };
 
 export const LoginedHome = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [cookies, setCookie, removeCookie] = useCookies(["userID"]);
 
   const {
-    register,
     handleSubmit,
+    register,
     reset,
     formState: { errors },
   } = useForm<RoomId>({
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<RoomId> = (data) => {
-    roomSuccess(false, data.id)
+  const joinButton: SubmitHandler<RoomId> = (data) => {
+    if (data.id.length != 6) {
+      setErrorMsg("6桁で入力してください");
+    } else {
+      console.log(data.id);
+      dispatch(createRoom(data.id));
+      roomSuccess();
+    }
     reset();
   };
 
-  const onClick = () => {
+  const createButton = () => {
     const xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.withCredentials = true
     let url = "http://localhost:8000/room";
@@ -39,80 +47,79 @@ export const LoginedHome = () => {
     xmlHttpRequest.onreadystatechange = () => {
       if (xmlHttpRequest.readyState == 4) {
         if (xmlHttpRequest.status == 201) {
-          let { roomId } = JSON.parse(xmlHttpRequest.responseText)
-          roomSuccess(true, roomId);
-        } else {
-          // if (xmlHttpRequest.status == 500) {
-          roomError();
+          const jsonObj = JSON.parse(xmlHttpRequest.responseText);
+          dispatch(createRoom(jsonObj.roomId));
+          dispatch(becomeOwner());
         }
       }
+      roomSuccess();
     };
-  }
+  };
 
-  const roomId = useSelector((state: any) => state.user.roomId);
-  const dispatch = useDispatch();
-
-  const roomSuccess = (isOwner: boolean, roomId: string) => {
-    if (isOwner) {
-      dispatch(becomeOwner());
-    }
-    dispatch(createroom(roomId))
+  const roomSuccess = () => {
     navigate("/standby");
   };
 
-  const roomError = () => {
-    setErrorMsg("部屋が見つかりません");
+  const logout = () => {
+    removeCookie("userID");
   };
 
   return (
     <>
-      <StyledForm>
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <StyledPage>
+        <p>userID : {cookies.userID}</p>
+        <StyledForm>
+          <form onSubmit={handleSubmit(joinButton)}>
+            <div>
+              <StyledInput
+                type="text"
+                placeholder="6桁の部屋ID"
+                {...register("id", {
+                  required: "部屋IDを入力してください",
+                  maxLength: {
+                    value: 6,
+                    message: "6桁で入力してください",
+                  },
+                  pattern: {
+                    value: /^[0-9-]+$/i,
+                    message: "部屋IDの形式が不正です",
+                  },
+                })}
+              />
+            </div>
+            <StyledErrorMessage>
+              <ErrorMessage
+                errors={errors}
+                name="id"
+                render={({ message }) => <span>{message}</span>}
+              />
+            </StyledErrorMessage>
+            <StyledButton type="submit">部屋IDで参加</StyledButton>
+            <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
+          </form>
           <div>
-            <StyledInput
-              id="roomID"
-              type="text"
-              placeholder="部屋ID"
-              {...register("id", {
-                required: "部屋IDを入力してください",
-                maxLength: {
-                  value: 6,
-                  message: "6桁で入力してください",
-                },
-                pattern: {
-                  value: /^[0-9-]+$/i,
-                  message: "部屋IDの形式が不正です",
-                },
-              })}
-            />
+            <StyledButton onClick={createButton}>部屋を作成</StyledButton>
           </div>
-          <StyledErrorMessage>
-            <ErrorMessage
-              errors={errors}
-              name="id"
-              render={({ message }) => <span>{message}</span>}
-            />
-          </StyledErrorMessage>
-          <StyledButton type="submit">部屋IDで参加</StyledButton>
-          <StyledErrorMessage>{errorMsg}</StyledErrorMessage>
-        </form>
-        <div>
-          <StyledButton onClick={onClick}>
-            部屋を作成
-          </StyledButton>
-        </div>
-        <p>roomid : {roomId}</p>
-      </StyledForm>
+          <StyledHr></StyledHr>
+          <div>
+            <StyledButton onClick={logout}>ログアウト</StyledButton>
+          </div>
+        </StyledForm>
+      </StyledPage>
     </>
   );
 };
+
+const StyledPage = styled.div`
+  padding: 100px 0px;
+`;
 
 const StyledForm = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 1;
   background: #ffffff;
-  max-width: 360px;
+  width: 500px;
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
@@ -146,7 +153,7 @@ const StyledInput = styled.input`
   padding: 8px 16px;
   margin: 10px;
   width: 80%;
-  height: 20px;
+  height: 40px;
   font-size: 1em;
 `;
 
@@ -155,7 +162,7 @@ const StyledErrorMessage = styled.div`
   font-size: 14px;
 `;
 
-// Reduxで部屋作成者かを判断
-// submithandlerの仕様
-// POST,GET
-// リロードするとオーナー情報が初期化される
+const StyledHr = styled.hr`
+  border-color: #646cff;
+  width: 400px;
+`;

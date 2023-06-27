@@ -38,13 +38,23 @@ export const StandbyGame = function() {
       switch(msg['command']) {
       case 'update_members':
         setUserNames(msg['command']['user_name'])
+				break
+			case 'start_game':
+				moveGame()
+				break
       }
       setStatus(2);
 		};
   },[])
 
+	const moveGame = function() {
+		// ゲーム画面への移動
+	}
+
   const startGame = function() {
     // ゲームを開始するとき
+		var sendJson = {"command": "start_game"};
+		socketRef.current?.send(JSON.stringify(sendJson));
   }
 
   const cancelGame = function() {
@@ -66,7 +76,10 @@ export const StandbyGame = function() {
   if (status == 0) {
     return (
       <>
-        <h3>部屋を検索中...</h3>
+        <StyledPage>
+          {" "}
+          <h3>部屋を検索中...</h3>
+        </StyledPage>
       </>
     );
   }
@@ -76,10 +89,12 @@ export const StandbyGame = function() {
   if (status == 1) {
 		return (
       <>
-        <h3>部屋が見つかりませんでした</h3>
-				<div>
-          <StyledButton onClick={backHome}>戻る</StyledButton>
-        </div>
+        <StyledPage>
+          <h3>部屋が見つかりませんでした</h3>
+          <div>
+            <StyledButton onClick={backHome}>戻る</StyledButton>
+          </div>
+        </StyledPage>
       </>
     );
   }
@@ -90,22 +105,19 @@ export const StandbyGame = function() {
   }
 
   // オーナー
-  if (localStorage.getItem("isOwner")) {
+  if (localStorage.getItem("isOwner") == "true") {
     return (
       <>
-        <h3>部屋 ID</h3>
-        <h2>{roomid}</h2>
-        <div>
-          <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
-        </div>
-        <div>
-          <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
-        </div>
-        <StyledHr></StyledHr>
-        <h2>参加者</h2>
-        <div>
-          {userList}
-        </div>
+        <StyledPage>
+          <h2>部屋 ID</h2>
+          <h1>{roomid}</h1>
+          <div>
+            <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
+          </div>
+          <div>
+            <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
+          </div>
+        </StyledPage>
       </>
     );
   }
@@ -113,19 +125,16 @@ export const StandbyGame = function() {
   // オーナーじゃない
   return (
     <>
-      <h2>部屋 ID</h2>
-      <h1>{roomid}</h1>
-      <div>
-        <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
-      </div>
-      <div>
-        <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
-      </div>
-      <StyledHr></StyledHr>
-      <h2>参加者</h2>
-      <div>
-        {userList}
-      </div>
+      <StyledPage>
+        <h2>部屋 ID</h2>
+        <h1>{roomid}</h1>
+        <div>
+          <StyledButton onClick={startGame}>ゲームを始める</StyledButton>
+        </div>
+        <div>
+          <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
+        </div>
+      </StyledPage>
     </>
   );
 };
@@ -140,6 +149,9 @@ const StyledUser = styled.h2`
   padding: 0;
   margin: 0;
   font-weight: 500;
+`;
+const StyledPage = styled.div`
+  padding: 100px 0px;
 `;
 
 const StyledButton = styled.button`

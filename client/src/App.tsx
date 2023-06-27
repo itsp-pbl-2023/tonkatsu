@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./views/Home";
 import Account from "./views/Account";
 import Login from "./views/Login";
+import Questioner from "./views/Questioner";
 import "./App.css";
 import { StandbyGame } from "./components/StandbyGame";
 
@@ -14,6 +15,7 @@ const App = () => {
         <Route path={`/account/`} element={<Account />} />
         <Route path={`/login/`} element={<Login />} />
         <Route path={`/standby/`} element={<StandbyGame />} />
+        <Route path={`/questioner/`} element={<Questioner />} />
       </Routes>
     </BrowserRouter>
   );
