@@ -56,7 +56,7 @@ func ConnectWS(ctx *gin.Context) {
 		select {
 		case m := <-clientReceiver:
 			// m should CmdUsers message.
-			userNames = m.Content.([]string)
+			userNames = m.Content.(UsersInRoom)
 			break wait
 		default:
 		}

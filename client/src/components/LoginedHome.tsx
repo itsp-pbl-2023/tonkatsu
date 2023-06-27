@@ -39,6 +39,7 @@ export const LoginedHome = () => {
 
   const createButton = () => {
     const xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.withCredentials = true
     let url = "http://localhost:8000/room";
     xmlHttpRequest.open("POST", url);
     xmlHttpRequest.send();
