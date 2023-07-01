@@ -13,6 +13,7 @@ type Context struct {
 	// あるお題に対して何個目の説明を表示しているか.
 	// zero-based index
 	index        uint
+	topic        string       // 問題「好きな食べ物は？」など
 	Questioner   model.UserID // 質問者
 	question     string       // お題
 	descriptions []string     // お題に対しchatGPTから得られた説明
@@ -49,7 +50,13 @@ func (ctx *Context) SetQuestioner(questionerID model.UserID) {
 	return
 }
 
+func (ctx *Context) SetTopic(topic string) {
+	ctx.topic = topic
+	return
+}
+
 func (ctx *Context) SetQuestion(question string) {
 	ctx.question = question
 	return
+
 }

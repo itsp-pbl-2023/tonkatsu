@@ -109,28 +109,11 @@ func (r *Room) handleMessagesFromQuestioner() {
 		case m := <-r.clients[r.context.Questioner].receiver:
 			switch m.Command {
 			case CmdClientQuestion:
-				question := m.Content.Question
-				answer := m.Content.Answer
+				topic := m.Content.topic
+				question := m.Content.question
+				r.context.SetTopic(topic)
 				r.context.SetQuestion(question)
-
-			}
-		}
-
-		for userId, client := range r.clients {
-			select {
-			case m := <-client.receiver:
-				switch m.Command {
-				case CmdClientLeaveRoom:
-					r.cancelSubscribe(userId)
-					names := r.userNames()
-					r.broadCast(&RoomMessage{
-						Command: CmdRoomUsersInRoom,
-						Content: names,
-					})
-				case CmdClientStartGame:
-					return
-				default:
-				}
+				return
 			default:
 			}
 		}
