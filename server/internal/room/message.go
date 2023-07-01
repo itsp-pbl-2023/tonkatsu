@@ -65,7 +65,7 @@ type RoomResult struct {
 
 type RoomResults struct {
 	result     []RoomResult
-	answer     string
+	question   string
 	questioner string
 }
 
@@ -111,8 +111,8 @@ const (
 )
 
 type ClientMsgQuestion struct {
+	topic    string
 	question string
-	answer   string
 }
 
 type ClientMsgAnswer string
