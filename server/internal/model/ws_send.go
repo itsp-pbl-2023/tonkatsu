@@ -47,7 +47,9 @@ type SendCorrectUsers struct {
 }
 
 type SendResults struct {
-	Result []SendResult `json:"result"`
+	Result     []SendResult `json:"result"`
+	Answer     string       `json:"answer"`
+	Questioner string       `json:"questioner"`
 }
 
 type SendResult struct {
@@ -55,4 +57,6 @@ type SendResult struct {
 	Score    int    `json:"score"`
 }
 
-type SendFinalResults = SendResults
+type SendFinalResults struct {
+	Result []SendResult `json:"result"`
+}

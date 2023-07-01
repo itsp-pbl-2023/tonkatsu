@@ -127,7 +127,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					Command: model.WSCmdSendDescription,
 					Content: model.SendDescription{
 						Description: description.description,
-						Index: description.index,
+						Index:       description.index,
 					},
 				})
 				if err != nil {
@@ -139,7 +139,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					Command: model.WSCmdSendAnswer,
 					Content: model.SendAnswer{
 						UserName: answer.userName,
-						Answer: answer.answer,
+						Answer:   answer.answer,
 					},
 				})
 				if err != nil {
@@ -149,7 +149,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				correctUsers := m.Content.(RoomCorrectUsers)
 				err := client.conn.WriteJSON(model.WSMessageToSend{
 					Command: model.WSCmdSendCorrectUsers,
-					Content: model.SendCorrectUsers {
+					Content: model.SendCorrectUsers{
 						CorrectUserList: correctUsers,
 					},
 				})
@@ -157,18 +157,20 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					return
 				}
 			case CmdRoomResult:
-				results := m.Content.([]RoomResult)
-				sendResults := make([]model.SendResult, len(results))
-				for i, result := range results {
+				results := m.Content.(RoomResults)
+				sendResults := make([]model.SendResult, len(results.result))
+				for i, result := range results.result {
 					sendResults[i] = model.SendResult{
 						UserName: result.userName,
-						Score: result.score,
+						Score:    result.score,
 					}
 				}
 				err := client.conn.WriteJSON(model.WSMessageToSend{
 					Command: model.WSCmdSendResults,
 					Content: model.SendResults{
-						Result: sendResults,
+						Result:     sendResults,
+						Answer:     results.answer,
+						Questioner: results.questioner,
 					},
 				})
 				if err != nil {
@@ -180,7 +182,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				for i, result := range results {
 					sendResults[i] = model.SendResult{
 						UserName: result.userName,
-						Score: result.score,
+						Score:    result.score,
 					}
 				}
 				err := client.conn.WriteJSON(model.WSMessageToSend{
