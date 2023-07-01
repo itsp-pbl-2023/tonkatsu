@@ -94,6 +94,12 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Content: message.Content.(ClientMsgCorrectUsers),
 			}
 			return
+		case model.WSCmdNextDescription:
+			client.sender <- &ClientMessage{
+				Command: CmdClientNextDescription,
+				Content: nil,
+			}
+			return
 	}
 }
 
