@@ -169,7 +169,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					Command: model.WSCmdSendResults,
 					Content: model.SendResults{
 						Result:     sendResults,
-						Answer:     results.answer,
+						Question:   results.question,
 						Questioner: results.questioner,
 					},
 				})
