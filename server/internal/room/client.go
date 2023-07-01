@@ -85,6 +85,7 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Command: CmdClientQuestion,
 				Content: question,
 			}
+			return
 		}
 	}
 }
