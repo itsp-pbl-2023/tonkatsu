@@ -24,10 +24,10 @@ const (
 	WSCmdQuestionerQuestion = "game_questioner_question"
 	WSCmdAnswererAnswer     = "game_answerer_answer"
 	WSCmdQuestionerCheck    = "game_questioner_check"
-	WSCmdNextDescription	= "game_next_description"
-	WSCmdQuestionerDone		= "game_questioner_done"
-	WSCmdNextGame			= "game_next_game"
-	WSCmdFinishGame			= "game_finish_game"
+	WSCmdNextDescription    = "game_next_description"
+	WSCmdQuestionerDone     = "game_questioner_done"
+	WSCmdNextGame           = "game_next_game"
+	WSCmdFinishGame         = "game_finish_game"
 )
 
 // TODO
