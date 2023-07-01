@@ -9,19 +9,19 @@ const (
 	// Content: UpdateMembers
 	WSCmdSendUpdateMembers = "update_members"
 	// Content: nil
-	WSCmdSendStartGame     = "start_game"
+	WSCmdSendStartGame = "start_game"
 	// Content: SendRole
-	WSCmdSendRole          = "role"
+	WSCmdSendRole = "role"
 	// Content: SendDescription
-	WSCmdSendDescription   = "game_description"
+	WSCmdSendDescription = "game_description"
 	// Content: SendAnswer
-	WSCmdSendAnswer        = "game_questioner_recieve" //typo
+	WSCmdSendAnswer = "game_questioner_recieve" //typo
 	// Content: SendCorrectUsers
-	WSCmdSendCorrectUsers  = "game_answerer_checked"
+	WSCmdSendCorrectUsers = "game_answerer_checked"
 	// Content: SendResults
-	WSCmdSendResults       = "game_show_result"
+	WSCmdSendResults = "game_show_result"
 	// Content: SendFinalResults
-	WSCmdSendFinalResults  = "game_show_all_result"
+	WSCmdSendFinalResults = "game_show_all_result"
 )
 
 type UpdateMembers struct {
