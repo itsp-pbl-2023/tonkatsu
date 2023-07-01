@@ -42,7 +42,7 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer func() {
 		client.sender <- &ClientMessage{
-			Command: CmdLeaveRoom,
+			Command: CmdClientLeaveRoom,
 			Content: nil,
 		}
 		client.left.Store(true)
@@ -91,10 +91,10 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 		select {
 		case m := <-client.receiver:
 			switch m.Command {
-			case CmdClose:
+			case CmdRoomClose:
 				return
-			case CmdUsersInRoom:
-				userNames := m.Content.(UsersInRoom)
+			case CmdRoomUsersInRoom:
+				userNames := m.Content.(RoomUsers)
 				err := client.conn.WriteJSON(model.WSMessageToSend{
 					Command: model.WSCmdUpdateMembers,
 					Content: model.UpdateMembers{UserNames: userNames},

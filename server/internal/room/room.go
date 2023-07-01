@@ -65,14 +65,14 @@ func (r *Room) handleMessagesInWaiting() {
 			select {
 			case m := <-client.receiver:
 				switch m.Command {
-				case CmdLeaveRoom:
+				case CmdClientLeaveRoom:
 					r.cancelSubscribe(userId)
 					names := r.userNames()
 					r.broadCast(&RoomMessage{
-						Command: CmdUsersInRoom,
+						Command: CmdRoomUsersInRoom,
 						Content: names,
 					})
-				case CmdStartGame:
+				case CmdClientStartGame:
 					return
 				default:
 				}
@@ -85,7 +85,7 @@ func (r *Room) handleMessagesInWaiting() {
 func (r *Room) close() {
 	for _, client := range r.clients {
 		client.sender <- &RoomMessage{
-			Command: CmdClose,
+			Command: CmdRoomClose,
 			Content: nil,
 		}
 	}
@@ -108,7 +108,7 @@ func (r *Room) subscribe(
 	r.clients[id] = client
 	names := r.userNames()
 	r.broadCast(&RoomMessage{
-		Command: CmdUsersInRoom,
+		Command: CmdRoomUsersInRoom,
 		Content: names,
 	})
 }
@@ -123,7 +123,7 @@ func (r *Room) broadCast(m *RoomMessage) {
 	}
 }
 
-func (r *Room) userNames() UsersInRoom {
+func (r *Room) userNames() RoomUsers {
 	names := make([]string, 0, len(r.clients))
 	for _, client := range r.clients {
 		names = append(names, client.name)

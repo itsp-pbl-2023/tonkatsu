@@ -48,7 +48,7 @@ func ConnectWS(ctx *gin.Context) {
 		return
 	}
 
-	var userNames UsersInRoom
+	var userNames RoomUsers
 	// maxWait * waitMiliSec ms だけRoomからの応答を待つ.
 	// 応答がなければRoomが閉じたと判断し終了.
 wait:
@@ -56,7 +56,7 @@ wait:
 		select {
 		case m := <-clientReceiver:
 			// m should CmdUsers message.
-			userNames = m.Content.(UsersInRoom)
+			userNames = m.Content.(RoomUsers)
 			break wait
 		default:
 		}

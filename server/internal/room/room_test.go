@@ -148,8 +148,8 @@ func (client *client) clientListenTest(logger chan<- *model.WSMessageToSend, t *
 		select {
 		case m := <-client.receiver:
 			switch m.Command {
-			case CmdUsersInRoom:
-				userNames := m.Content.(UsersInRoom)
+			case CmdRoomUsersInRoom:
+				userNames := m.Content.(RoomUsers)
 				t.Logf("userNames: %v\n", userNames)
 				logger <- &model.WSMessageToSend{
 					Command: model.WSCmdUpdateMembers,
