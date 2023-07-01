@@ -55,7 +55,10 @@ wait:
 	for t, maxWait, waitMiliSec := 0, 10, 100*time.Millisecond; true; t += 1 {
 		select {
 		case m := <-clientReceiver:
-			// m should CmdUsers message.
+			if m.Command != CmdRoomUsersInRoom {
+				ctx.Status(http.StatusInternalServerError)
+				return
+			}
 			userNames = m.Content.(RoomUsers)
 			break wait
 		default:
