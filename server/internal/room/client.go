@@ -69,6 +69,12 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 		switch message.Command {
 		case model.WSCmdLeave:
 			return
+		case model.WSCmdStartGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientStartGame,
+				Content: nil,
+			}
+			return
 		}
 	}
 }

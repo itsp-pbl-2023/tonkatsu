@@ -9,6 +9,7 @@ type WSMessageToReceive struct {
 
 const (
 	WSCmdLeave = "leave"
+	WSCmdStartGame = "start_game"
 )
 
 // TODO
