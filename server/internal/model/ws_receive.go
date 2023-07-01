@@ -27,6 +27,7 @@ const (
 	WSCmdNextDescription	= "game_next_description"
 	WSCmdQuestionerDone		= "game_questioner_done"
 	WSCmdNextGame			= "game_next_game"
+	WSCmdFinishGame			= "game_finish_game"
 )
 
 // TODO
