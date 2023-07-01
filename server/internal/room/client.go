@@ -100,6 +100,13 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Content: nil,
 			}
 			return
+		case model.WSCmdQuestionerDone:
+			client.sender <- &ClientMessage{
+				Command: CmdClientDoneQuestion,
+				Content: nil,
+			}
+			return
+		}
 	}
 }
 
