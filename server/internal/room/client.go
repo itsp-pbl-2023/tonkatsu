@@ -6,6 +6,7 @@ import (
 	"time"
 	"tonkatsu-server/internal/model"
 
+	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
 
@@ -75,6 +76,15 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Content: nil,
 			}
 			return
+		case model.WSCmdQuestionerQuestion:
+			var question ClientMsgQuestion
+			if err := json.Unmarshal(message.Content.([]byte), &question); err != nil {
+				return
+			}
+			client.sender <- &ClientMessage{
+				Command: CmdClientQuestion,
+				Content: question,
+			}
 		}
 	}
 }

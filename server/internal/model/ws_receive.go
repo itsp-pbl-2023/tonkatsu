@@ -1,15 +1,18 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type WSMessageToReceive struct {
-	Command string `json:"command"`
-	Content any    `json:"content,omitempty"`
+	Command string
+	Content interface{}
 }
 
 const (
-	WSCmdLeave = "leave"
-	WSCmdStartGame = "start_game"
+	WSCmdLeave              = "leave"
+	WSCmdStartGame          = "start_game"
+	WSCmdQuestionerQuestion = "game_questioner_question"
 )
 
 // TODO
