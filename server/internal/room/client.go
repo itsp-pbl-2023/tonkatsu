@@ -8,6 +8,7 @@ import (
 	"time"
 	"tonkatsu-server/internal/model"
 
+	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
 
@@ -70,6 +71,54 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 
 		switch message.Command {
 		case model.WSCmdLeave:
+			return
+		case model.WSCmdStartGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientStartGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdQuestionerQuestion:
+			client.sender <- &ClientMessage{
+				Command: CmdClientQuestion,
+				Content: message.Content.(ClientMsgQuestion),
+			}
+			return
+		case model.WSCmdAnswererAnswer:
+			client.sender <- &ClientMessage{
+				Command: CmdClientAnswer,
+				Content: message.Content.(ClientMsgAnswer),
+			}
+			return
+		case model.WSCmdQuestionerCheck:
+			client.sender <- &ClientMessage{
+				Command: CmdClientCorrectUsers,
+				Content: message.Content.(ClientMsgCorrectUsers),
+			}
+			return
+		case model.WSCmdNextDescription:
+			client.sender <- &ClientMessage{
+				Command: CmdClientNextGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdQuestionerDone:
+			client.sender <- &ClientMessage{
+				Command: CmdClientDoneQuestion,
+				Content: nil,
+			}
+			return
+		case model.WSCmdNextGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientNextGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdFinishGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientFinishGame,
+				Content: nil,
+			}
 			return
 		}
 	}
