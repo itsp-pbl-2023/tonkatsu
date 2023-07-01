@@ -17,8 +17,8 @@ type Context struct {
 	question     string         // お題
 	descriptions []string       // お題に対しchatGPTから得られた説明
 	// 正解したユーザのリスト
-	//   correctUsers[turn][i]
-	correctUsers [][]model.UserID
+	//   correctUsers[turn][index][i]
+	correctUsers [][][]model.UserID
 }
 
 func NewContext() *Context {
@@ -30,7 +30,7 @@ func NewContext() *Context {
 		questioner: 0,
 		question: "",
 		descriptions: make([]string, 0),
-		correctUsers: make([][]model.UserID, 0),
+		correctUsers: make([][][]model.UserID, 0),
 	}
 	return new
 }
