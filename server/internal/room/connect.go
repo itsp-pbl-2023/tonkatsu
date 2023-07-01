@@ -76,7 +76,7 @@ wait:
 	}
 	defer conn.Close()
 	err = conn.WriteJSON(model.WSMessageToSend{
-		Command: model.WSCmdUpdateMembers,
+		Command: model.WSCmdSendUpdateMembers,
 		Content: model.UpdateMembers{UserNames: userNames},
 	})
 	if err != nil {
