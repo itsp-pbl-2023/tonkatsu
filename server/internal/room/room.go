@@ -1,6 +1,7 @@
 package room
 
 import (
+	"tonkatsu-server/internal/chatgpt"
 	"tonkatsu-server/internal/game"
 	. "tonkatsu-server/internal/model"
 )
@@ -53,6 +54,10 @@ func (r *Room) run() {
 	r.tellRoles()                                                      // クライアントにQuestionerのIDを伝える
 	r.context.SetPhase(game.PhaseQuestion)                             // 状態をQuestionerの回答待ちにする
 	r.handleMessagesFromQuestioner()                                   // questionerの回答を待つ
+	r.getDescriptions()                                                // ChatGPTにQuestionを投げる
+	for i := 0; i < 5; i++ {
+		r.sendDescription(i)
+	}
 
 }
 
@@ -93,7 +98,7 @@ func (r *Room) setParticipants() {
 	for id := range r.clients {
 		userIDs = append(userIDs, id)
 	}
-	r.context.participants = userIDs
+	r.context.Participants = userIDs
 }
 
 func (r *Room) tellRoles() {
@@ -118,6 +123,15 @@ func (r *Room) handleMessagesFromQuestioner() {
 			}
 		}
 	}
+}
+
+func (r *Room) getDescriptions() {
+	r.context.Descriptions = chatgpt.AskChatGPT(r.context.Question)
+}
+
+func (r *Room) sendDescription(index int) {
+	message := RoomMessage{Command: CmdRoomDescription, Content: RoomDescription{Description: r.context.Descriptions[index], Index: index}}
+	r.broadCast(&message)
 }
 
 func (r *Room) close() {
