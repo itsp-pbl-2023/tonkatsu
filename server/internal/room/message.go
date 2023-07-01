@@ -34,7 +34,7 @@ const (
 	// Content: RoomCorrectUsers
 	CmdRoomCorrectUsers
 	// リザルト
-	// Content: []RoomResult
+	// Content: RoomResults
 	CmdRoomResult
 	// 全体のリザルト
 	// Content: []RoomFinalResult
@@ -61,6 +61,12 @@ type RoomCorrectUsers []string
 type RoomResult struct {
 	userName string
 	score    int
+}
+
+type RoomResults struct {
+	result     []RoomResult
+	answer     string
+	questioner string
 }
 
 type RoomFinalResult struct {
