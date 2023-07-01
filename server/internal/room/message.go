@@ -48,7 +48,7 @@ type RoomQuestioner model.UserID
 
 type RoomDescription struct {
 	description string
-	index 		  int
+	index       int
 }
 
 type RoomAnswer struct {

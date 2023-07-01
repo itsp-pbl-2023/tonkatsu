@@ -48,6 +48,12 @@ func NewRoom(roomId RoomID, userId UserID) Room {
 func (r *Room) run() {
 	defer r.close()
 	r.handleMessagesInWaiting()
+	r.broadCast(&RoomMessage{Command: CmdRoomStartGame, Content: nil}) // クライアントにゲーム開始を伝える
+	r.setParticipants()                                                // ゲームの参加者IDを設定
+	r.tellRoles()                                                      // クライアントにQuestionerのIDを伝える
+	r.context.SetPhase(game.PhaseQuestion)                             // 状態をQuestionerの回答待ちにする
+	r.handleMessagesFromQuestioner()                                   // questionerの回答を待つ
+
 }
 
 // 待機中に送られてくるメッセージを処理する
@@ -61,6 +67,55 @@ func (r *Room) handleMessagesInWaiting() {
 		default:
 		}
 		// クライアントからのメッセージを処理
+		for userId, client := range r.clients {
+			select {
+			case m := <-client.receiver:
+				switch m.Command {
+				case CmdClientLeaveRoom:
+					r.cancelSubscribe(userId)
+					names := r.userNames()
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomUsersInRoom,
+						Content: names,
+					})
+				case CmdClientStartGame:
+					return
+				default:
+				}
+			default:
+			}
+		}
+	}
+}
+
+func (r *Room) setParticipants() {
+	var userIDs []UserID
+	for id := range r.clients {
+		userIDs = append(userIDs, id)
+	}
+	r.context.participants = userIDs
+}
+
+func (r *Room) tellRoles() {
+	var questionerID userID
+	questionerID = r.context.SelectQuestioner()
+	r.broadCast(&RoomMessage{Command: CmdRoomQuestioner, Content: questionerID})
+}
+
+func (r *Room) handleMessagesFromQuestioner() {
+	for {
+		// questionerからのメッセージを処理
+		select {
+		case m := <-r.clients[r.context.Questioner].receiver:
+			switch m.Command {
+			case CmdClientQuestion:
+				question := m.Content.Question
+				answer := m.Content.Answer
+				r.context.SetQuestion(question)
+
+			}
+		}
+
 		for userId, client := range r.clients {
 			select {
 			case m := <-client.receiver:
