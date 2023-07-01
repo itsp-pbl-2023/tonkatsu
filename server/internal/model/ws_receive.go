@@ -13,6 +13,7 @@ const (
 	WSCmdLeave              = "leave"
 	WSCmdStartGame          = "start_game"
 	WSCmdQuestionerQuestion = "game_questioner_question"
+	WSCmdAnswererAnswer     = "game_answerer_answer"
 )
 
 // TODO
