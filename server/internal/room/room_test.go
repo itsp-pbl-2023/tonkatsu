@@ -59,7 +59,7 @@ func TestEnterRoom(t *testing.T) {
 	select {
 	case m := <-logger:
 		cmd := m.Command
-		if cmd != model.WSCmdUpdateMembers {
+		if cmd != model.WSCmdSendUpdateMembers {
 			t.Fatalf("Failed to receive a proper message.")
 		}
 		names := m.Content.(model.UpdateMembers).UserNames
@@ -117,7 +117,7 @@ func TestEnterRoomMultiple(t *testing.T) {
 		select {
 		case m := <-logger:
 			cmd := m.Command
-			if cmd != model.WSCmdUpdateMembers {
+			if cmd != model.WSCmdSendUpdateMembers {
 				t.Fatalf("Failed to receive a proper message\ni: %d\n", i)
 			}
 			names := m.Content.(model.UpdateMembers).UserNames
@@ -152,7 +152,7 @@ func (client *client) clientListenTest(logger chan<- *model.WSMessageToSend, t *
 				userNames := m.Content.(RoomUsers)
 				t.Logf("userNames: %v\n", userNames)
 				logger <- &model.WSMessageToSend{
-					Command: model.WSCmdUpdateMembers,
+					Command: model.WSCmdSendUpdateMembers,
 					Content: model.UpdateMembers{UserNames: userNames},
 				}
 			default:
