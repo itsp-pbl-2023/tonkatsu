@@ -32,6 +32,7 @@ export const LoginedHome = () => {
     } else {
       console.log(data.id);
       dispatch(createRoom(data.id));
+      dispatch(becomeOwner(false));
       roomSuccess();
     }
     reset();
@@ -49,7 +50,7 @@ export const LoginedHome = () => {
         if (xmlHttpRequest.status == 201) {
           const jsonObj = JSON.parse(xmlHttpRequest.responseText);
           dispatch(createRoom(jsonObj.roomId));
-          dispatch(becomeOwner());
+          dispatch(becomeOwner(true));
         }
       }
       roomSuccess();
@@ -57,7 +58,7 @@ export const LoginedHome = () => {
   };
 
   const roomSuccess = () => {
-    navigate("/standby");
+    navigate("/game");
   };
 
   const logout = () => {

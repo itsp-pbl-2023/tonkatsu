@@ -1,14 +1,21 @@
-import { useState, useEffect } from "react";
+import { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 import React from "react"
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { GameState } from "../views/Game";
 
-export const StandbyGame = function() {
+type Props = {
+  socketRef: React.MutableRefObject<WebSocket | undefined>;
+  setGameState: (state: GameState) => void;
+};
+
+export const StandbyGame: FC<Props> = (props) => {
 
 	const roomid = useSelector((state: any) => state.user.roomId);
   const isOwner = useSelector((state: any) => state.user.isOwner);
-  const socketRef = React.useRef<WebSocket>();
+  console.log(isOwner);
+  const socketRef = props.socketRef;
   const [userNames, setUserNames] = useState([]);
 	const navigate = useNavigate();
 	var flag = 0;
@@ -26,29 +33,31 @@ export const StandbyGame = function() {
   // WebSocket
   useEffect(() => {
 		if (flag == 0) {
-			flag = 1;
-			console.log('Hello Socket');
-			var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid);
-			socketRef.current = socket;
+      flag = 1;
+      // ソケットエラー
+      if (socketRef.current) {
+        socketRef.current.onerror = function() {
+          setStatus(1);
+        };
+      }
 
-			// ソケットエラー
-			socket.onerror = function() {
-				setStatus(1);
-			};
-
-			// サーバーからのソケット受け取り
-			socket.onmessage = function (event) {
-				var msg = JSON.parse(event.data);
-				switch(msg['command']) {
-				case 'update_members':
-					setUserNames(msg['content']['user_name'])
-					break
-				case 'start_game':
-					moveGame()
-					break
-				}
-				setStatus(2);
-			};
+       // サーバーからのソケット受け取り
+      if (socketRef.current) {
+        console.log('socket connect');
+        socketRef.current.onmessage = function (event) {
+          var msg = JSON.parse(event.data);
+          switch(msg['command']) {
+          case 'update_members':
+            console.log(msg['content']['user_name'])
+            setUserNames(msg['content']['user_name'])
+            break
+          case 'start_game':
+            moveGame()
+            break
+          }
+          setStatus(2);
+        };
+      }
 		}
   },[])
 
@@ -60,11 +69,14 @@ export const StandbyGame = function() {
     // ゲームを開始するとき
 		var sendJson = {"command": "start_game"};
 		socketRef.current?.send(JSON.stringify(sendJson));
+    props.setGameState(GameState.Init);
   }
 
   const cancelGame = function() {
     // ゲームをキャンセルするとき
     localStorage.removeItem("isOwner");
+    props.setGameState(GameState.Init);
+    navigate("/");
   }
 
   const exitRoom = function() {
@@ -72,6 +84,7 @@ export const StandbyGame = function() {
     var sendJson = {"command": "leave"};
     socketRef.current?.send(JSON.stringify(sendJson));
 		socketRef.current?.close();
+    props.setGameState(GameState.Init);
 		navigate("/");
   }
 
@@ -112,7 +125,7 @@ export const StandbyGame = function() {
   }
 
   // オーナー
-  if (localStorage.getItem("isOwner") == "true") {
+  if (isOwner) {
     return (
       <>
         <StyledPage>

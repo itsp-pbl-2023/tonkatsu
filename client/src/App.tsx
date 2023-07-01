@@ -5,7 +5,7 @@ import Account from "./views/Account";
 import Login from "./views/Login";
 import Questioner from "./views/Questioner";
 import "./App.css";
-import { StandbyGame } from "./components/StandbyGame";
+import { Game } from "./views/Game";
 
 const App = () => {
   return (
@@ -14,8 +14,7 @@ const App = () => {
         <Route path={`/`} element={<Home />} />
         <Route path={`/account/`} element={<Account />} />
         <Route path={`/login/`} element={<Login />} />
-        <Route path={`/standby/`} element={<StandbyGame />} />
-        <Route path={`/questioner/`} element={<Questioner />} />
+        <Route path={`/game`} element={<Game />} />
       </Routes>
     </BrowserRouter>
   );
