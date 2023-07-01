@@ -77,13 +77,9 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			}
 			return
 		case model.WSCmdQuestionerQuestion:
-			var question ClientMsgQuestion
-			if err := json.Unmarshal(message.Content.([]byte), &question); err != nil {
-				return
-			}
 			client.sender <- &ClientMessage{
 				Command: CmdClientQuestion,
-				Content: question,
+				Content: message.Content.(ClientMsgQuestion),
 			}
 			return
 		case model.WSCmdAnswererAnswer:

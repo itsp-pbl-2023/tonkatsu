@@ -9,6 +9,11 @@ type WSMessageToReceive struct {
 	Content interface{}
 }
 
+type WSContentQuestionerQuestion struct {
+	Topic    string
+	Question string
+}
+
 const (
 	WSCmdLeave              = "leave"
 	WSCmdStartGame          = "start_game"
@@ -18,7 +23,20 @@ const (
 
 // TODO
 func UnMarshalJSON(m []byte) (WSMessageToReceive, error) {
-	var message WSMessageToReceive
-	err := json.Unmarshal(m, &message)
-	return message, err
+	var message json.RawMessage
+	messageRceive := WSMessageToReceive {
+		Content: &message,
+	}
+	if err := json.Unmarshal(m, &messageRceive); err != nil {
+		return messageRceive, err
+	}
+	switch messageRceive.Command {
+	case WSCmdQuestionerQuestion:
+		var content WSContentQuestionerQuestion
+		if err := json.Unmarshal(message, &content); err != nil {
+			return messageRceive, err
+		}
+		messageRceive.Content = content
+	}
+	return messageRceive, nil
 }
