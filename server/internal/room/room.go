@@ -1,7 +1,7 @@
 package room
 
 import (
-	"tonkatsu-server/internal/model"
+	"tonkatsu-server/internal/game"
 	. "tonkatsu-server/internal/model"
 )
 
@@ -14,6 +14,7 @@ type Room struct {
 	host       UserID
 	subscriber chan *enteredClient
 	clients    map[UserID]roomClient
+	context    *game.Context
 	closer     chan bool
 }
 
@@ -39,12 +40,18 @@ func NewRoom(roomId RoomID, userId UserID) Room {
 		host:       userId,
 		subscriber: make(chan *enteredClient, 1),
 		clients:    map[UserID]roomClient{},
+		context:    game.NewContext(),
 		closer:     make(chan bool, 1),
 	}
 }
 
 func (r *Room) run() {
 	defer r.close()
+	r.handleMessagesInWaiting()
+}
+
+// 待機中に送られてくるメッセージを処理する
+func (r *Room) handleMessagesInWaiting() {
 	for {
 		select {
 		case c := <-r.subscriber:
@@ -57,24 +64,21 @@ func (r *Room) run() {
 		for userId, client := range r.clients {
 			select {
 			case m := <-client.receiver:
-				r.handleMessages(m, userId, client)
+				switch m.Command {
+				case CmdLeaveRoom:
+					r.cancelSubscribe(userId)
+					names := r.userNames()
+					r.broadCast(&RoomMessage{
+						Command: CmdUsersInRoom,
+						Content: names,
+					})
+				case CmdStartGame:
+					return
+				default:
+				}
 			default:
 			}
 		}
-	}
-}
-
-func (r *Room) handleMessages(m *ClientMessage, userId model.UserID, client roomClient) {
-	switch m.Command {
-	case CmdLeaveRoom:
-		r.cancelSubscribe(userId)
-		names := r.userNames()
-		r.broadCast(&RoomMessage{
-			Command: CmdUsersInRoom,
-			Content: names,
-		})
-	default:
-
 	}
 }
 

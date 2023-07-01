@@ -34,4 +34,6 @@ const (
 	// 退室
 	// Content: nil
 	CmdLeaveRoom = ClientMsgCommand(iota)
+	// ゲーム開始
+	CmdStartGame
 )
