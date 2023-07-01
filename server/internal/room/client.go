@@ -90,13 +90,13 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			return
 		case model.WSCmdQuestionerCheck:
 			client.sender <- &ClientMessage{
-				Command: CmdClientCheck,
+				Command: CmdClientCorrectUsers,
 				Content: message.Content.(ClientMsgCorrectUsers),
 			}
 			return
 		case model.WSCmdNextDescription:
 			client.sender <- &ClientMessage{
-				Command: CmdClientNextDescription,
+				Command: CmdClientNextGame,
 				Content: nil,
 			}
 			return
