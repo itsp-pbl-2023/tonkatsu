@@ -167,7 +167,7 @@ func (r *Room) handleMessagesNextDescription() bool {
 }
 
 func (r *Room) showResult() {
-	results := r.context.CalculateScore(int(r.context.CurrentTurn()))
+	results := r.context.CalculateScore(r.context.CurrentTurn())
 	roomResults := make([]RoomResult, 0, len(results))
 	for userId, score := range results {
 		roomResults = append(roomResults, RoomResult{

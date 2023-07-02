@@ -70,7 +70,7 @@ func (ctx *Context) NextTurn() {
 	ctx.SelectQuestioner()
 }
 
-func (ctx *Context) CalculateScore(turn int) map[model.UserID]int {
+func (ctx *Context) CalculateScore(turn uint) map[model.UserID]int {
 	// max index = 4
 	scoreTable := []int{50, 40, 30, 20, 10}
 	scores := make(map[model.UserID]int, len(ctx.Participants))
