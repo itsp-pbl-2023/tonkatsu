@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { StandbyGame } from "../components/StandbyGame";
+import { Questioner } from "../components/Questioner";
 import { useSelector } from "react-redux";
-import Questioner from "./Questioner";
 
 export const GameState = {
   Init: 0,
   Standby: 1,
   Questioner: 2,
   Answerer: 3,
-  Result: 4
-}
+  Result: 4,
+};
 
-export type GameState = typeof GameState[keyof typeof GameState];
+export type GameState = (typeof GameState)[keyof typeof GameState];
 
-export const Game = function() {
-
+export const Game = function () {
   const roomid = useSelector((state: any) => state.user.roomId);
   const [gameState, setGameState] = useState<GameState>(GameState.Init);
 
@@ -29,23 +28,28 @@ export const Game = function() {
       setGameState(GameState.Standby);
       var socket = new WebSocket("ws://localhost:8000/ws?roomid=" + roomid);
       socketRef.current = socket;
-      console.log('SocketRef OK');
+      console.log("SocketRef OK");
     }
-  },[])
+  }, []);
 
   switch (gameState) {
-  case GameState.Standby:
-    return (
-      <>
-        <StandbyGame socketRef={socketRef} setGameState={setGameState} />
-      </>
-    );
-  case GameState.Questioner:
-  case GameState.Answerer:
-  case GameState.Result:
-  default:
-    break;
+    case GameState.Standby:
+      return (
+        <>
+          <StandbyGame socketRef={socketRef} setGameState={setGameState} />
+        </>
+      );
+    case GameState.Questioner:
+      return (
+        <>
+          <Questioner socketRef={socketRef} setGameState={setGameState} />
+        </>
+      );
+    case GameState.Answerer:
+    case GameState.Result:
+    default:
+      break;
   }
 
-  return (<></>);
+  return <></>;
 };

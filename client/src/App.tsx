@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./views/Home";
 import Account from "./views/Account";
 import Login from "./views/Login";
-import Questioner from "./views/Questioner";
 import "./App.css";
 import { Game } from "./views/Game";
 

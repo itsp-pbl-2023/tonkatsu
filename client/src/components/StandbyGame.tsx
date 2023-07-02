@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from "react";
 import styled from "styled-components";
-import React from "react"
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { GameState } from "../views/Game";
@@ -11,20 +11,19 @@ type Props = {
 };
 
 export const StandbyGame: FC<Props> = (props) => {
-
-	const roomid = useSelector((state: any) => state.user.roomId);
+  const roomid = useSelector((state: any) => state.user.roomId);
   const isOwner = useSelector((state: any) => state.user.isOwner);
   console.log(isOwner);
   const socketRef = props.socketRef;
   const [userNames, setUserNames] = useState([]);
-	const navigate = useNavigate();
-	var flag = 0;
+  const navigate = useNavigate();
+  var flag = 0;
 
-	// status:
-	// 0: WebSocket 接続前
-	// 1: WebSocket 接続失敗
+  // status:
+  // 0: WebSocket 接続前
+  // 1: WebSocket 接続失敗
   // 2: WebSocket 接続成功
-	const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState(0);
 
   useEffect(() => {
     localStorage.setItem("isOwner", isOwner);
@@ -32,65 +31,65 @@ export const StandbyGame: FC<Props> = (props) => {
 
   // WebSocket
   useEffect(() => {
-		if (flag == 0) {
+    if (flag == 0) {
       flag = 1;
       // ソケットエラー
       if (socketRef.current) {
-        socketRef.current.onerror = function() {
+        socketRef.current.onerror = function () {
           setStatus(1);
         };
       }
 
-       // サーバーからのソケット受け取り
+      // サーバーからのソケット受け取り
       if (socketRef.current) {
-        console.log('socket connect');
+        console.log("socket connect");
         socketRef.current.onmessage = function (event) {
           var msg = JSON.parse(event.data);
-          switch(msg['command']) {
-          case 'update_members':
-            console.log(msg['content']['user_name'])
-            setUserNames(msg['content']['user_name'])
-            break
-          case 'start_game':
-            moveGame()
-            break
+          switch (msg["command"]) {
+            case "update_members":
+              console.log(msg["content"]["user_name"]);
+              setUserNames(msg["content"]["user_name"]);
+              break;
+            case "start_game":
+              moveGame();
+              break;
           }
           setStatus(2);
         };
       }
-		}
-  },[])
+    }
+  }, []);
 
-	const moveGame = function() {
-		// ゲーム画面への移動
-	}
+  const moveGame = function () {
+    // ゲーム画面への移動
+  };
 
-  const startGame = function() {
+  const startGame = function () {
     // ゲームを開始するとき
-		var sendJson = {"command": "start_game"};
-		socketRef.current?.send(JSON.stringify(sendJson));
-    props.setGameState(GameState.Init);
-  }
+    var sendJson = { command: "start_game" };
+    socketRef.current?.send(JSON.stringify(sendJson));
+    props.setGameState(GameState.Questioner);
+  };
 
-  const cancelGame = function() {
+  const cancelGame = function () {
     // ゲームをキャンセルするとき
     localStorage.removeItem("isOwner");
     props.setGameState(GameState.Init);
     navigate("/");
-  }
+  };
 
-  const exitRoom = function() {
+  const exitRoom = function () {
     // 部屋を抜けるとき
-    var sendJson = {"command": "leave"};
+    var sendJson = { command: "leave" };
     socketRef.current?.send(JSON.stringify(sendJson));
-		socketRef.current?.close();
+    socketRef.current?.close();
     props.setGameState(GameState.Init);
-		navigate("/");
-  }
+    navigate("/");
+  };
 
-	const backHome = function() {
-		navigate("/");
-	}
+  const backHome = function () {
+    navigate("/");
+  };
 
   // 部屋検索中
   if (status == 0) {
@@ -104,10 +103,9 @@ export const StandbyGame: FC<Props> = (props) => {
     );
   }
 
-
   // 部屋が見つからないとき
   if (status == 1) {
-		return (
+    return (
       <>
         <StyledPage>
           <h3>部屋が見つかりませんでした</h3>
@@ -121,7 +119,7 @@ export const StandbyGame: FC<Props> = (props) => {
 
   const userList = [];
   for (const userName of userNames) {
-    userList.push(<StyledUser>{userName}</StyledUser>)
+    userList.push(<StyledUser>{userName}</StyledUser>);
   }
 
   // オーナー
@@ -137,11 +135,9 @@ export const StandbyGame: FC<Props> = (props) => {
           <div>
             <StyledButton onClick={cancelGame}>ゲームをキャンセル</StyledButton>
           </div>
-					<StyledHr></StyledHr>
-					<h2>参加者</h2>
-					<div>
-						{userList}
-					</div>
+          <StyledHr></StyledHr>
+          <h2>参加者</h2>
+          <div>{userList}</div>
         </StyledPage>
       </>
     );
@@ -159,11 +155,9 @@ export const StandbyGame: FC<Props> = (props) => {
         <div>
           <StyledButton onClick={exitRoom}>部屋を抜ける</StyledButton>
         </div>
-				<StyledHr></StyledHr>
-				<h2>参加者</h2>
-				<div>
-					{userList}
-				</div>
+        <StyledHr></StyledHr>
+        <h2>参加者</h2>
+        <div>{userList}</div>
       </StyledPage>
     </>
   );
@@ -196,11 +190,11 @@ const StyledButton = styled.button`
   background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
-&:hover {
-  border-color: #646cff;
-}
-&:focus,
-&:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  &:hover {
+    border-color: #646cff;
+  }
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 `;
