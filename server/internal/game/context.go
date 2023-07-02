@@ -37,7 +37,9 @@ func NewContext() *Context {
 }
 
 func (ctx *Context) SelectQuestioner() model.UserID {
-	return ctx.Participants[ctx.turn]
+	questioner := ctx.Participants[ctx.turn]
+	ctx.Questioner = questioner
+	return questioner
 }
 
 func (ctx *Context) SetPhase(p phase) {
