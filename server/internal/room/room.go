@@ -51,13 +51,28 @@ func (r *Room) run() {
 	r.handleMessagesInWaiting()
 	r.broadCast(&RoomMessage{Command: CmdRoomStartGame, Content: nil}) // クライアントにゲーム開始を伝える
 	r.setParticipants()                                                // ゲームの参加者IDを設定
-	r.tellRoles()                                                      // クライアントにQuestionerのIDを伝える
-	r.context.SetPhase(game.PhaseQuestion)                             // 状態をQuestionerの回答待ちにする
-	r.handleMessagesFromQuestioner()                                   // questionerの回答を待つ
-	r.getDescriptions()                                                // ChatGPTにQuestionを投げる
-	for i := 0; i < 5; i++ {
-		r.sendDescription(i)
+
+	for {
+		r.tellRoles()                          // クライアントにQuestionerのIDを伝える
+		r.context.SetPhase(game.PhaseQuestion) // 状態をQuestionerの回答待ちにする
+		r.handleMessagesFromQuestioner()       // questionerの回答を待つ
+		r.getDescriptions()                    // ChatGPTにQuestionを投げる
+		for i := 0; i < 5; i++ {
+			r.sendDescription(i)
+			r.handleMessagesFromAnswerer()            //Answererの回答を待つ→出題者に逐次送る
+			r.handleMessagesQuestionerCheck()         //採点を待つ→スコアを回答者に送る
+			done := r.handleMessagesNextDescription() //game_next_description/game_questioner_doneを待つ
+			if done {
+				break
+			}
+		}
+		r.showResult()                  //game_show_resultを送る
+		is_finish := r.handleNextGame() //game_next_game/game_finish_gameを待つ, 出題者変更
+		if is_finish {
+			break
+		}
 	}
+	r.showAllResults()
 
 }
 
@@ -121,7 +136,9 @@ func (r *Room) handleMessagesFromQuestioner() {
 				return
 			default:
 			}
+		default:
 		}
+
 	}
 }
 
@@ -134,6 +151,34 @@ func (r *Room) sendDescription(index int) {
 	r.broadCast(&message)
 }
 
+//採点を待つ→スコアを回答者に送る
+func (r *Room) handleMessagesFromAnswerer() {
+
+}
+
+func (r *Room) handleMessagesQuestionerCheck() {
+
+}
+
+//game_next_description/game_questioner_doneを待つ
+// game_questioner_doneならtrueを返す
+func (r *Room) handleMessagesNextDescription() bool {
+	return false
+}
+
+func (r *Room) showResult() {
+
+}
+
+//game_next_game/game_finish_gameを待つ, 出題者変更
+// game_finish_gameなら trueを返す
+func (r *Room) handleNextGame() bool {
+	return false
+}
+
+func (r *Room) showAllResults() {
+
+}
 func (r *Room) close() {
 	for _, client := range r.clients {
 		client.sender <- &RoomMessage{
