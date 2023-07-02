@@ -49,11 +49,19 @@ func NewRoom(roomId RoomID, userId UserID) Room {
 
 func (r *Room) run() {
 	defer r.close()
-	r.handleMessagesInWaiting()
+	shouldClose := r.handleMessagesInWaiting()
+	if shouldClose {
+		return
+	}
 	r.broadCast(&RoomMessage{Command: CmdRoomStartGame, Content: nil}) // クライアントにゲーム開始を伝える
 	r.setParticipants()                                                // ゲームの参加者IDを設定
 
 	for {
+		select {
+		case <-r.closer:
+			return
+		default:
+		}
 		r.tellRoles()                          // クライアントにQuestionerのIDを伝える
 		r.context.SetPhase(game.PhaseQuestion) // 状態をQuestionerの回答待ちにする
 		r.handleMessagesFromQuestioner()       // questionerの回答を待つ
@@ -76,13 +84,13 @@ func (r *Room) run() {
 }
 
 // 待機中に送られてくるメッセージを処理する
-func (r *Room) handleMessagesInWaiting() {
+func (r *Room) handleMessagesInWaiting() bool {
 	for {
 		select {
 		case c := <-r.subscriber:
 			r.subscribe(c.id, c.name, c.receiver, c.sender)
 		case <-r.closer:
-			return
+			return true
 		default:
 		}
 		// クライアントからのメッセージを処理
@@ -98,7 +106,7 @@ func (r *Room) handleMessagesInWaiting() {
 						Content: names,
 					})
 				case CmdClientStartGame:
-					return
+					return false
 				default:
 				}
 			default:
