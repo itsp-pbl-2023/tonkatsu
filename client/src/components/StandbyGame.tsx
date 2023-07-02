@@ -68,7 +68,7 @@ export const StandbyGame: FC<Props> = (props) => {
     // ゲームを開始するとき
     var sendJson = { command: "start_game" };
     socketRef.current?.send(JSON.stringify(sendJson));
-    props.setGameState(GameState.Questioner);
+    // props.setGameState(GameState.Answerer);
   };
 
   const cancelGame = function () {
