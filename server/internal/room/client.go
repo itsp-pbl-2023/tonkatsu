@@ -78,7 +78,6 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Command: CmdClientStartGame,
 				Content: nil,
 			}
-			return
 		case model.WSCmdQuestionerQuestion:
 			content := message.Content.(model.WSContentQuestionerQuestion)
 			client.sender <- &ClientMessage{
@@ -88,45 +87,38 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 					question: content.Question,
 				},
 			}
-			return
 		case model.WSCmdAnswererAnswer:
 			content := message.Content.(model.WSContentAnswererAnswer)
 			client.sender <- &ClientMessage{
 				Command: CmdClientAnswer,
 				Content: ClientMsgAnswer(content),
 			}
-			return
 		case model.WSCmdQuestionerCheck:
 			content := message.Content.(model.WSContentCorrectUserList)
 			client.sender <- &ClientMessage{
 				Command: CmdClientCorrectUsers,
 				Content: ClientMsgCorrectUsers(content),
 			}
-			return
 		case model.WSCmdNextDescription:
 			client.sender <- &ClientMessage{
 				Command: CmdClientNextGame,
 				Content: nil,
 			}
-			return
 		case model.WSCmdQuestionerDone:
 			client.sender <- &ClientMessage{
 				Command: CmdClientDoneQuestion,
 				Content: nil,
 			}
-			return
 		case model.WSCmdNextGame:
 			client.sender <- &ClientMessage{
 				Command: CmdClientNextGame,
 				Content: nil,
 			}
-			return
 		case model.WSCmdFinishGame:
 			client.sender <- &ClientMessage{
 				Command: CmdClientFinishGame,
 				Content: nil,
 			}
-			return
 		}
 	}
 }
@@ -134,10 +126,6 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 func (client *client) listenRoom(wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer func() {
-		client.writeJSONWithLog(&model.WSMessageToSend{
-			Command: model.WSCmdLeave,
-			Content: nil,
-		})
 		client.left.Store(true)
 	}()
 
