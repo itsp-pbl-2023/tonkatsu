@@ -86,6 +86,7 @@ wait:
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
+	fmt.Fprintf(os.Stderr, "[LOG] Send WebSocket Message.   Command: \"update_members\".   UserName: %s\n", userName)
 
 	client := newClient(
 		userId,
