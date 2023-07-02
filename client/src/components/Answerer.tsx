@@ -98,6 +98,8 @@ export const Answerer: FC<Props> = (props) => {
               }
               setStatus(AnswerState.Result);
               break;
+            // case "game_show_result":
+            //   break;
           }
         };
       }

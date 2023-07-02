@@ -34,6 +34,11 @@ export const Game = function () {
     }
   }, []);
 
+  // const setResult = (json: {
+  //   command}) => {
+
+  // }
+
   switch (gameState) {
     case GameState.Standby:
       return (
