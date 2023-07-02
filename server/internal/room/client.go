@@ -43,6 +43,10 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 	// TODO
 	defer wg.Done()
 	defer func() {
+		client.sender <- &ClientMessage{
+			Command: CmdClientLeaveRoom,
+			Content: nil,
+		}
 		client.left.Store(true)
 	}()
 
