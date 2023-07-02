@@ -96,7 +96,7 @@ export const Questioner: FC<Props> = (props) => {
             case "game_questioner_recieve":
               const args: answerer = {
                 ...msg["content"],
-                isCorrect: false,
+                isCorrect: 0,
               };
               setAnswerers(answerers.concat(args));
               break;
@@ -218,13 +218,13 @@ export const Questioner: FC<Props> = (props) => {
                       <StyledAnswer>{answerer.answer}</StyledAnswer>
                       <StyledQuizButton
                         onClick={() => judge(true, answerer)}
-                        isCorrect={true}
+                        color="#98FB98"
                       >
                         o
                       </StyledQuizButton>
                       <StyledQuizButton
                         onClick={() => judge(false, answerer)}
-                        isCorrect={false}
+                        color="#FA8072"
                       >
                         x
                       </StyledQuizButton>
@@ -379,7 +379,7 @@ const StyledQuizButton = styled.button<ButtonProps>`
   text-decoration: none;
   text-align: center;
   margin: 10px 0;
-  background-color: ${({ isCorrect }) => (isCorrect ? "	#98FB98" : "#FA8072")};
+  background-color: ${(props) => (props.color ? props.color : "white")};
 `;
 
 const StyledHr = styled.hr`
