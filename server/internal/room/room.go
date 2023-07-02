@@ -59,8 +59,7 @@ func (r *Room) run() {
 		r.getDescriptions()                    // ChatGPTにQuestionを投げる
 		for i := 0; i < 5; i++ {
 			r.sendDescription(i)
-			r.handleMessagesFromAnswerer()            //Answererの回答を待つ→出題者に逐次送る
-			r.handleMessagesQuestionerCheck()         //採点を待つ→スコアを回答者に送る
+			r.handleMessagesFromAnswerer()            //Answererの回答を待つ→出題者に逐次送る or 採点を待つ→スコアを回答者に送る
 			done := r.handleMessagesNextDescription() //game_next_description/game_questioner_doneを待つ
 			if done {
 				break
@@ -172,6 +171,14 @@ func (r *Room) handleMessagesFromAnswerer() {
 							userName: userName,
 							answer: string(answer),
 						},
+					})
+					return
+				// 回答者が自身の正誤を確認した時
+				case CmdClientCorrectUsers:
+					correctUsers := m.Content.(ClientMsgCorrectUsers)
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomCorrectUsers,
+						Content: correctUsers,
 					})
 					return
 				default:
