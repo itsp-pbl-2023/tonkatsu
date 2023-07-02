@@ -8,7 +8,6 @@ import (
 	"time"
 	"tonkatsu-server/internal/model"
 
-	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
 
@@ -175,8 +174,8 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				err := client.conn.WriteJSON(model.WSMessageToSend{
 					Command: model.WSCmdSendDescription,
 					Content: model.SendDescription{
-						Description: description.description,
-						Index:       description.index,
+						Description: description.Description,
+						Index:       description.Index,
 					},
 				})
 				if err != nil {

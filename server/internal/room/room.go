@@ -129,9 +129,10 @@ func (r *Room) handleMessagesFromQuestioner() {
 			case message := <-client.receiver:
 				switch message.Command {
 				case CmdClientQuestion:
+					question := message.Content.(ClientMsgQuestion)
 					if userId == r.context.Questioner {
-						topic := message.Content.topic
-						question := message.Content.question
+						topic := question.topic
+						question := question.question
 						r.context.SetTopic(topic)
 						r.context.SetQuestion(question)
 						return
