@@ -60,3 +60,20 @@ func (ctx *Context) SetQuestion(question string) {
 	return
 
 }
+
+func (ctx *Context) NextTurn() {
+	ctx.turn += 1
+	ctx.SelectQuestioner()
+}
+
+func (ctx *Context) CalculateScore() map[model.UserID]int {
+	// max index = 4
+	scoreTable := []int{50, 40, 30, 20, 10}
+	scores := make(map[model.UserID]int, len(ctx.Participants))
+	for i, correctUsers := range ctx.correctUsers[ctx.turn] {
+		for _, userId := range correctUsers {
+			scores[userId] = scoreTable[i]
+		}
+	}
+	return scores
+}
