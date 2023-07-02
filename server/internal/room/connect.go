@@ -101,4 +101,5 @@ wait:
 	go client.listenWS(&wg)
 	go client.listenRoom(&wg)
 	wg.Wait()
+	fmt.Fprintln(os.Stderr, "[LOG] Disconnect WebSocket")
 }
