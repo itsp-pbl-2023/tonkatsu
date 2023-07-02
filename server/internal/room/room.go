@@ -153,8 +153,6 @@ func (r *Room) sendDescription(index int) {
 
 // 採点を待つ→スコアを回答者に送る
 func (r *Room) handleMessagesFromAnswerer() {
-
-}
 	for {
 		for _, participant := range r.context.Participants {
 			select {
@@ -182,6 +180,7 @@ func (r *Room) handleMessagesFromAnswerer() {
 			}
 		}
 	}
+}
 
 func (r *Room) handleMessagesQuestionerCheck() {
 
