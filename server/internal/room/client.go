@@ -1,11 +1,14 @@
 package room
 
 import (
+	"fmt"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 	"tonkatsu-server/internal/model"
 
+	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
 
@@ -69,12 +72,59 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 		switch message.Command {
 		case model.WSCmdLeave:
 			return
+		case model.WSCmdStartGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientStartGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdQuestionerQuestion:
+			client.sender <- &ClientMessage{
+				Command: CmdClientQuestion,
+				Content: message.Content.(ClientMsgQuestion),
+			}
+			return
+		case model.WSCmdAnswererAnswer:
+			client.sender <- &ClientMessage{
+				Command: CmdClientAnswer,
+				Content: message.Content.(ClientMsgAnswer),
+			}
+			return
+		case model.WSCmdQuestionerCheck:
+			client.sender <- &ClientMessage{
+				Command: CmdClientCorrectUsers,
+				Content: message.Content.(ClientMsgCorrectUsers),
+			}
+			return
+		case model.WSCmdNextDescription:
+			client.sender <- &ClientMessage{
+				Command: CmdClientNextGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdQuestionerDone:
+			client.sender <- &ClientMessage{
+				Command: CmdClientDoneQuestion,
+				Content: nil,
+			}
+			return
+		case model.WSCmdNextGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientNextGame,
+				Content: nil,
+			}
+			return
+		case model.WSCmdFinishGame:
+			client.sender <- &ClientMessage{
+				Command: CmdClientFinishGame,
+				Content: nil,
+			}
+			return
 		}
 	}
 }
 
 func (client *client) listenRoom(wg *sync.WaitGroup) {
-	// TODO
 	defer wg.Done()
 	defer func() {
 		client.conn.WriteJSON(model.WSMessageToSend{
@@ -96,12 +146,105 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 			case CmdRoomUsersInRoom:
 				userNames := m.Content.(RoomUsers)
 				err := client.conn.WriteJSON(model.WSMessageToSend{
-					Command: model.WSCmdUpdateMembers,
+					Command: model.WSCmdSendUpdateMembers,
 					Content: model.UpdateMembers{UserNames: userNames},
 				})
 				if err != nil {
 					return
 				}
+			case CmdRoomStartGame:
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendStartGame,
+					Content: nil,
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomQuestioner:
+				questioner := m.Content.(RoomQuestioner)
+				isQuestioner := client.id == model.UserID(questioner)
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendRole,
+					Content: model.SendRole{IsQuestioner: isQuestioner},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomDescription:
+				description := m.Content.(RoomDescription)
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendDescription,
+					Content: model.SendDescription{
+						Description: description.description,
+						Index:       description.index,
+					},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomAnswer:
+				answer := m.Content.(RoomAnswer)
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendAnswer,
+					Content: model.SendAnswer{
+						UserName: answer.userName,
+						Answer:   answer.answer,
+					},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomCorrectUsers:
+				correctUsers := m.Content.(RoomCorrectUsers)
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendCorrectUsers,
+					Content: model.SendCorrectUsers{
+						CorrectUserList: correctUsers,
+					},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomResult:
+				results := m.Content.(RoomResults)
+				sendResults := make([]model.SendResult, len(results.result))
+				for i, result := range results.result {
+					sendResults[i] = model.SendResult{
+						UserName: result.userName,
+						Score:    result.score,
+					}
+				}
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendResults,
+					Content: model.SendResults{
+						Result:     sendResults,
+						Question:   results.question,
+						Questioner: results.questioner,
+					},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomFinalResult:
+				results := m.Content.([]RoomFinalResult)
+				sendResults := make([]model.SendResult, len(results))
+				for i, result := range results {
+					sendResults[i] = model.SendResult{
+						UserName: result.userName,
+						Score:    result.score,
+					}
+				}
+				err := client.conn.WriteJSON(model.WSMessageToSend{
+					Command: model.WSCmdSendResults,
+					Content: model.SendFinalResults{
+						Result: sendResults,
+					},
+				})
+				if err != nil {
+					return
+				}
+			default:
+				fmt.Fprintf(os.Stderr, "[ERR]Client (id:%d) received an undefined message: %v", client.id, m)
 			}
 		default:
 		}
