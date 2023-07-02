@@ -99,6 +99,9 @@ const (
 	// 正解者
 	// Content: ClientMsgCorrectUsers
 	CmdClientCorrectUsers
+	//次の問題へ
+	// Content:nil
+	CmdClientNextQuestion
 	// 問題一つ終了
 	// Content: nil
 	CmdClientDoneQuestion

@@ -73,7 +73,6 @@ func (r *Room) run() {
 		}
 	}
 	r.showAllResults()
-
 }
 
 // 待機中に送られてくるメッセージを処理する
@@ -163,7 +162,22 @@ func (r *Room) handleMessagesQuestionerCheck() {
 //game_next_description/game_questioner_doneを待つ
 // game_questioner_doneならtrueを返す
 func (r *Room) handleMessagesNextDescription() bool {
-	return false
+
+	for {
+		// questionerからのメッセージを処理
+		select {
+		case message := <-r.clients[r.context.Questioner].receiver:
+			switch message.Command {
+			case CmdClientNextQuestion:
+				return false
+			case CmdClientDoneQuestion:
+				return true
+			default:
+				return false
+			}
+		default:
+		}
+	}
 }
 
 func (r *Room) showResult() {
@@ -177,7 +191,16 @@ func (r *Room) handleNextGame() bool {
 }
 
 func (r *Room) showAllResults() {
+	names := r.userNames()
+	results := make([]RoomFinalResult, 0, len(names))
 
+	for _, name := range names {
+		score := 0
+		result := RoomFinalResult{userName: name, score: score}
+		results = append(results, result)
+	}
+	message := RoomMessage{Command: CmdRoomFinalResult, Content: results}
+	r.broadCast(&message)
 }
 func (r *Room) close() {
 	for _, client := range r.clients {
