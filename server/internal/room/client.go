@@ -80,9 +80,13 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			}
 			return
 		case model.WSCmdQuestionerQuestion:
+			content := message.Content.(model.WSContentQuestionerQuestion)
 			client.sender <- &ClientMessage{
 				Command: CmdClientQuestion,
-				Content: message.Content.(ClientMsgQuestion),
+				Content: ClientMsgQuestion{
+					topic: content.Topic,
+					question: content.Question,
+				},
 			}
 			return
 		case model.WSCmdAnswererAnswer:

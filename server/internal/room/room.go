@@ -295,6 +295,7 @@ func (r *Room) showAllResults() {
 	message := RoomMessage{Command: CmdRoomFinalResult, Content: results}
 	r.broadCast(&message)
 }
+
 func (r *Room) close() {
 	for _, client := range r.clients {
 		client.sender <- &RoomMessage{
