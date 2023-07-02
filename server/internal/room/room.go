@@ -151,10 +151,37 @@ func (r *Room) sendDescription(index int) {
 	r.broadCast(&message)
 }
 
-//採点を待つ→スコアを回答者に送る
+// 採点を待つ→スコアを回答者に送る
 func (r *Room) handleMessagesFromAnswerer() {
 
 }
+	for {
+		for _, participant := range r.context.Participants {
+			select {
+			case m := <-r.clients[participant].receiver:
+				if participant == r.context.Questioner {
+					continue
+				}
+				switch m.Command {
+				case CmdClientAnswer:
+					// userNameの取得
+					userName := r.clients[participant].name
+					// answerの取得
+					answer := m.Content.(ClientMsgAnswer)
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomAnswer,
+						Content: RoomAnswer{
+							userName: userName,
+							answer: string(answer),
+						},
+					})
+					return
+				default:
+				}
+			default:
+			}
+		}
+	}
 
 func (r *Room) handleMessagesQuestionerCheck() {
 
