@@ -37,6 +37,8 @@ func NewContext() *Context {
 }
 
 func (ctx *Context) SelectQuestioner() model.UserID {
+	questioner := ctx.Participants[ctx.turn]
+	ctx.Questioner = questioner
 	return ctx.Participants[ctx.turn]
 }
 
