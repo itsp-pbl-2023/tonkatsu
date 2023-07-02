@@ -1,6 +1,7 @@
 package room
 
 import (
+	"fmt"
 	"tonkatsu-server/internal/chatgpt"
 	"tonkatsu-server/internal/game"
 	. "tonkatsu-server/internal/model"
@@ -72,7 +73,6 @@ func (r *Room) run() {
 		}
 	}
 	r.showAllResults()
-
 }
 
 // 待機中に送られてくるメッセージを処理する
@@ -123,21 +123,24 @@ func (r *Room) tellRoles() {
 
 func (r *Room) handleMessagesFromQuestioner() {
 	for {
-		// questionerからのメッセージを処理
-		select {
-		case m := <-r.clients[r.context.Questioner].receiver:
-			switch m.Command {
-			case CmdClientQuestion:
-				topic := m.Content.topic
-				question := m.Content.question
-				r.context.SetTopic(topic)
-				r.context.SetQuestion(question)
-				return
+		for userId, client := range r.clients {
+			// questionerからのメッセージを処理
+			select {
+			case message := <-client.receiver:
+				switch message.Command {
+				case CmdClientQuestion:
+					if userId == r.context.Questioner {
+						topic := message.Content.topic
+						question := message.Content.question
+						r.context.SetTopic(topic)
+						r.context.SetQuestion(question)
+						return
+					}
+				default:
+				}
 			default:
 			}
-		default:
 		}
-
 	}
 }
 
@@ -197,7 +200,28 @@ func (r *Room) handleMessagesFromAnswerer() {
 // game_next_description/game_questioner_doneを待つ
 // game_questioner_doneならtrueを返す
 func (r *Room) handleMessagesNextDescription() bool {
-	return false
+
+	for {
+		for userId, client := range r.clients {
+			// questionerからのメッセージを処理
+			select {
+			case message := <-client.receiver:
+				switch message.Command {
+				case CmdClientNextQuestion:
+					if userId == r.context.Questioner {
+						return false
+					}
+				case CmdClientDoneQuestion:
+					if userId == r.context.Questioner {
+						return true
+					}
+				default:
+					return false
+				}
+			default:
+			}
+		}
+	}
 }
 
 func (r *Room) showResult() {
@@ -206,14 +230,14 @@ func (r *Room) showResult() {
 	for userId, score := range results {
 		roomResults = append(roomResults, RoomResult{
 			userName: r.clients[userId].name,
-			score: score,
+			score:    score,
 		})
 	}
 	r.broadCast(&RoomMessage{
 		Command: CmdRoomResult,
 		Content: RoomResults{
-			result: roomResults,
-			question: r.context.Question,
+			result:     roomResults,
+			question:   r.context.Question,
 			questioner: r.clients[r.context.Questioner].name,
 		},
 	})
@@ -225,7 +249,7 @@ func (r *Room) handleNextGame() bool {
 	for {
 		for userId, client := range r.clients {
 			select {
-			case m := <- client.receiver:
+			case m := <-client.receiver:
 				switch m.Command {
 				case CmdClientNextGame:
 					if userId != r.context.Questioner {
@@ -247,7 +271,20 @@ func (r *Room) handleNextGame() bool {
 }
 
 func (r *Room) showAllResults() {
+	names := r.userNames()
+	results := make([]RoomFinalResult, 0, len(names))
 
+	scores := r.context.CalculateFinalScore()
+	for userId, score := range scores {
+		name, err := GetUserName(userId)
+		if err != nil {
+			fmt.Printf(err.Error())
+		}
+		result := RoomFinalResult{userName: name, score: score}
+		results = append(results, result)
+	}
+	message := RoomMessage{Command: CmdRoomFinalResult, Content: results}
+	r.broadCast(&message)
 }
 func (r *Room) close() {
 	for _, client := range r.clients {
