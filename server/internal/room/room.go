@@ -150,7 +150,7 @@ func (r *Room) sendDescription(index int) {
 	r.broadCast(&message)
 }
 
-// 採点を待つ→スコアを回答者に送る
+// Answererの回答を待つ→出題者に逐次送る
 func (r *Room) handleMessagesFromAnswerer() {
 	for {
 		for _, participant := range r.context.Participants {
@@ -169,7 +169,7 @@ func (r *Room) handleMessagesFromAnswerer() {
 						Command: CmdRoomAnswer,
 						Content: RoomAnswer{
 							userName: userName,
-							answer: string(answer),
+							answer:   string(answer),
 						},
 					})
 					return
@@ -189,11 +189,7 @@ func (r *Room) handleMessagesFromAnswerer() {
 	}
 }
 
-func (r *Room) handleMessagesQuestionerCheck() {
-
-}
-
-//game_next_description/game_questioner_doneを待つ
+// game_next_description/game_questioner_doneを待つ
 // game_questioner_doneならtrueを返す
 func (r *Room) handleMessagesNextDescription() bool {
 	return false
@@ -203,7 +199,7 @@ func (r *Room) showResult() {
 
 }
 
-//game_next_game/game_finish_gameを待つ, 出題者変更
+// game_next_game/game_finish_gameを待つ, 出題者変更
 // game_finish_gameなら trueを返す
 func (r *Room) handleNextGame() bool {
 	return false
