@@ -50,7 +50,7 @@ export const StandbyGame: FC<Props> = (props) => {
               console.log(msg["content"]["user_name"]);
               setUserNames(msg["content"]["user_name"]);
               break;
-            case "start_game":
+            case "role":
               if (msg["content"]["isQuestioner"])
                 props.setGameState(GameState.Questioner);
               else
