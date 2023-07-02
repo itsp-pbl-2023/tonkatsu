@@ -190,13 +190,49 @@ func (r *Room) handleMessagesNextDescription() bool {
 }
 
 func (r *Room) showResult() {
-
+	results := r.context.CalculateScore(r.context.CurrentTurn())
+	roomResults := make([]RoomResult, 0, len(results))
+	for userId, score := range results {
+		roomResults = append(roomResults, RoomResult{
+			userName: r.clients[userId].name,
+			score: score,
+		})
+	}
+	r.broadCast(&RoomMessage{
+		Command: CmdRoomResult,
+		Content: RoomResults{
+			result: roomResults,
+			question: r.context.Question,
+			questioner: r.clients[r.context.Questioner].name,
+		},
+	})
 }
 
 //game_next_game/game_finish_gameを待つ, 出題者変更
 // game_finish_gameなら trueを返す
 func (r *Room) handleNextGame() bool {
-	return false
+	for {
+		for userId, client := range r.clients {
+			select {
+			case m := <- client.receiver:
+				switch m.Command {
+				case CmdClientNextGame:
+					if userId != r.context.Questioner {
+						break
+					}
+					r.context.NextTurn()
+					return false
+				case CmdClientFinishGame:
+					if userId != r.context.Questioner {
+						break
+					}
+					return true
+				default:
+				}
+			default:
+			}
+		}
+	}
 }
 
 func (r *Room) showAllResults() {
