@@ -47,8 +47,8 @@ type RoomUsers []string
 type RoomQuestioner model.UserID
 
 type RoomDescription struct {
-	description string
-	index       int
+	Description string
+	Index       int
 }
 
 type RoomAnswer struct {
@@ -99,6 +99,9 @@ const (
 	// 正解者
 	// Content: ClientMsgCorrectUsers
 	CmdClientCorrectUsers
+	//次の問題へ
+	// Content:nil
+	CmdClientNextQuestion
 	// 問題一つ終了
 	// Content: nil
 	CmdClientDoneQuestion
