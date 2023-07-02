@@ -84,7 +84,7 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			client.sender <- &ClientMessage{
 				Command: CmdClientQuestion,
 				Content: ClientMsgQuestion{
-					topic: content.Topic,
+					topic:    content.Topic,
 					question: content.Question,
 				},
 			}
