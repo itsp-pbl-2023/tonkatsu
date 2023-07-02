@@ -68,6 +68,8 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			return
 		}
 
+		client.LogReceivedMessage(&message)
+
 		switch message.Command {
 		case model.WSCmdLeave:
 			return
@@ -126,7 +128,7 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 func (client *client) listenRoom(wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer func() {
-		client.conn.WriteJSON(model.WSMessageToSend{
+		client.writeJSONWithLog(&model.WSMessageToSend{
 			Command: model.WSCmdLeave,
 			Content: nil,
 		})
@@ -144,7 +146,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				return
 			case CmdRoomUsersInRoom:
 				userNames := m.Content.(RoomUsers)
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendUpdateMembers,
 					Content: model.UpdateMembers{UserNames: userNames},
 				})
@@ -152,7 +154,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					return
 				}
 			case CmdRoomStartGame:
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendStartGame,
 					Content: nil,
 				})
@@ -162,7 +164,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 			case CmdRoomQuestioner:
 				questioner := m.Content.(RoomQuestioner)
 				isQuestioner := client.id == model.UserID(questioner)
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendRole,
 					Content: model.SendRole{IsQuestioner: isQuestioner},
 				})
@@ -171,7 +173,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				}
 			case CmdRoomDescription:
 				description := m.Content.(RoomDescription)
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendDescription,
 					Content: model.SendDescription{
 						Description: description.Description,
@@ -183,7 +185,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				}
 			case CmdRoomAnswer:
 				answer := m.Content.(RoomAnswer)
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendAnswer,
 					Content: model.SendAnswer{
 						UserName: answer.userName,
@@ -195,7 +197,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 				}
 			case CmdRoomCorrectUsers:
 				correctUsers := m.Content.(RoomCorrectUsers)
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendCorrectUsers,
 					Content: model.SendCorrectUsers{
 						CorrectUserList: correctUsers,
@@ -213,7 +215,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 						Score:    result.score,
 					}
 				}
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendResults,
 					Content: model.SendResults{
 						Result:     sendResults,
@@ -233,7 +235,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 						Score:    result.score,
 					}
 				}
-				err := client.conn.WriteJSON(model.WSMessageToSend{
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
 					Command: model.WSCmdSendResults,
 					Content: model.SendFinalResults{
 						Result: sendResults,
@@ -248,4 +250,13 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 		default:
 		}
 	}
+}
+
+func (client *client) LogReceivedMessage(message *model.WSMessageToReceive) {
+	fmt.Fprintf(os.Stderr, "[LOG] Receive WebSocket Message.   Command: \"%v\".   UserName: %s.\n", message.Command, client.name)
+}
+
+func (client *client) writeJSONWithLog(message *model.WSMessageToSend) error {
+	fmt.Fprintf(os.Stderr, "[LOG] Send WebSocket Message.   Command: \"%v\".   UserName: %s.\n", message.Command, client.name)
+	return client.conn.WriteJSON(message)
 }
