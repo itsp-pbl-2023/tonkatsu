@@ -123,21 +123,24 @@ func (r *Room) tellRoles() {
 
 func (r *Room) handleMessagesFromQuestioner() {
 	for {
-		// questionerからのメッセージを処理
-		select {
-		case m := <-r.clients[r.context.Questioner].receiver:
-			switch m.Command {
-			case CmdClientQuestion:
-				topic := m.Content.topic
-				question := m.Content.question
-				r.context.SetTopic(topic)
-				r.context.SetQuestion(question)
-				return
+		for userId, client := range r.clients {
+			// questionerからのメッセージを処理
+			select {
+			case message := <-client.receiver:
+				switch message.Command {
+				case CmdClientQuestion:
+					if userId == r.context.Questioner {
+						topic := message.Content.topic
+						question := message.Content.question
+						r.context.SetTopic(topic)
+						r.context.SetQuestion(question)
+						return
+					}
+				default:
+				}
 			default:
 			}
-		default:
 		}
-
 	}
 }
 
@@ -164,18 +167,24 @@ func (r *Room) handleMessagesQuestionerCheck() {
 func (r *Room) handleMessagesNextDescription() bool {
 
 	for {
-		// questionerからのメッセージを処理
-		select {
-		case message := <-r.clients[r.context.Questioner].receiver:
-			switch message.Command {
-			case CmdClientNextQuestion:
-				return false
-			case CmdClientDoneQuestion:
-				return true
+		for userId, client := range r.clients {
+			// questionerからのメッセージを処理
+			select {
+			case message := <-client.receiver:
+				switch message.Command {
+				case CmdClientNextQuestion:
+					if userId == r.context.Questioner {
+						return false
+					}
+				case CmdClientDoneQuestion:
+					if userId == r.context.Questioner {
+						return true
+					}
+				default:
+					return false
+				}
 			default:
-				return false
 			}
-		default:
 		}
 	}
 }
