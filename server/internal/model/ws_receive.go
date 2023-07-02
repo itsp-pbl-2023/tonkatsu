@@ -1,19 +1,63 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type WSMessageToReceive struct {
-	Command string `json:"command"`
-	Content any    `json:"content,omitempty"`
+	Command string
+	Content interface{}
 }
 
+type WSContentQuestionerQuestion struct {
+	Topic    string
+	Question string
+}
+
+type WSContentAnswererAnswer string
+
+type WSContentCorrectUserList []string
+
 const (
-	WSCmdLeave = "leave"
+	WSCmdLeave              = "leave"
+	WSCmdStartGame          = "start_game"
+	WSCmdQuestionerQuestion = "game_questioner_question"
+	WSCmdAnswererAnswer     = "game_answerer_answer"
+	WSCmdQuestionerCheck    = "game_questioner_check"
+	WSCmdNextDescription    = "game_next_description"
+	WSCmdQuestionerDone     = "game_questioner_done"
+	WSCmdNextGame           = "game_next_game"
+	WSCmdFinishGame         = "game_finish_game"
 )
 
 // TODO
 func UnMarshalJSON(m []byte) (WSMessageToReceive, error) {
-	var message WSMessageToReceive
-	err := json.Unmarshal(m, &message)
-	return message, err
+	var message json.RawMessage
+	messageRceive := WSMessageToReceive{
+		Content: &message,
+	}
+	if err := json.Unmarshal(m, &messageRceive); err != nil {
+		return messageRceive, err
+	}
+	switch messageRceive.Command {
+	case WSCmdQuestionerQuestion:
+		var content WSContentQuestionerQuestion
+		if err := json.Unmarshal(message, &content); err != nil {
+			return messageRceive, err
+		}
+		messageRceive.Content = content
+	case WSCmdAnswererAnswer:
+		var content WSContentAnswererAnswer
+		if err := json.Unmarshal(message, &content); err != nil {
+			return messageRceive, err
+		}
+		messageRceive.Content = content
+	case WSCmdQuestionerCheck:
+		var content WSContentCorrectUserList
+		if err := json.Unmarshal(message, &content); err != nil {
+			return messageRceive, err
+		}
+		messageRceive.Content = content
+	}
+	return messageRceive, nil
 }

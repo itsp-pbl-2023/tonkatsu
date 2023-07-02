@@ -48,15 +48,18 @@ func ConnectWS(ctx *gin.Context) {
 		return
 	}
 
-	var userNames UsersInRoom
+	var userNames RoomUsers
 	// maxWait * waitMiliSec ms だけRoomからの応答を待つ.
 	// 応答がなければRoomが閉じたと判断し終了.
 wait:
 	for t, maxWait, waitMiliSec := 0, 10, 100*time.Millisecond; true; t += 1 {
 		select {
 		case m := <-clientReceiver:
-			// m should CmdUsers message.
-			userNames = m.Content.(UsersInRoom)
+			if m.Command != CmdRoomUsersInRoom {
+				ctx.Status(http.StatusInternalServerError)
+				return
+			}
+			userNames = m.Content.(RoomUsers)
 			break wait
 		default:
 		}
@@ -76,7 +79,7 @@ wait:
 	}
 	defer conn.Close()
 	err = conn.WriteJSON(model.WSMessageToSend{
-		Command: model.WSCmdUpdateMembers,
+		Command: model.WSCmdSendUpdateMembers,
 		Content: model.UpdateMembers{UserNames: userNames},
 	})
 	if err != nil {
