@@ -56,7 +56,7 @@ func (ctx *Context) SetTopic(topic string) {
 }
 
 func (ctx *Context) SetQuestion(question string) {
-	ctx.question = question
+	ctx.Question = question
 	return
 
 }
@@ -80,4 +80,18 @@ func (ctx *Context) CalculateScore(turn uint) map[model.UserID]int {
 		}
 	}
 	return scores
+}
+
+func (ctx *Context) CalculateFinalScore() map[model.UserID]int {
+
+	turnLength := len(ctx.correctUsers)
+	totalScores := make(map[model.UserID]int, len(ctx.Participants))
+	for i := 0; i < turnLength; i++ {
+		scores := ctx.CalculateScore(uint(i))
+
+		for userId, score := range scores {
+			totalScores[userId] += score
+		}
+	}
+	return totalScores
 }

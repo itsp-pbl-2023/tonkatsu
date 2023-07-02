@@ -1,6 +1,7 @@
 package room
 
 import (
+	"fmt"
 	"tonkatsu-server/internal/chatgpt"
 	"tonkatsu-server/internal/game"
 	. "tonkatsu-server/internal/model"
@@ -195,14 +196,14 @@ func (r *Room) showResult() {
 	for userId, score := range results {
 		roomResults = append(roomResults, RoomResult{
 			userName: r.clients[userId].name,
-			score: score,
+			score:    score,
 		})
 	}
 	r.broadCast(&RoomMessage{
 		Command: CmdRoomResult,
 		Content: RoomResults{
-			result: roomResults,
-			question: r.context.Question,
+			result:     roomResults,
+			question:   r.context.Question,
 			questioner: r.clients[r.context.Questioner].name,
 		},
 	})
@@ -214,7 +215,7 @@ func (r *Room) handleNextGame() bool {
 	for {
 		for userId, client := range r.clients {
 			select {
-			case m := <- client.receiver:
+			case m := <-client.receiver:
 				switch m.Command {
 				case CmdClientNextGame:
 					if userId != r.context.Questioner {
@@ -239,8 +240,12 @@ func (r *Room) showAllResults() {
 	names := r.userNames()
 	results := make([]RoomFinalResult, 0, len(names))
 
-	for _, name := range names {
-		score := 0
+	scores := r.context.CalculateFinalScore()
+	for userId, score := range scores {
+		name, err := GetUserName(userId)
+		if err != nil {
+			fmt.Printf(err.Error())
+		}
 		result := RoomFinalResult{userName: name, score: score}
 		results = append(results, result)
 	}
