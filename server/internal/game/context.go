@@ -61,16 +61,20 @@ func (ctx *Context) SetQuestion(question string) {
 
 }
 
+func (ctx *Context) CurrentTurn() uint {
+	return ctx.turn
+}
+
 func (ctx *Context) NextTurn() {
 	ctx.turn += 1
 	ctx.SelectQuestioner()
 }
 
-func (ctx *Context) CalculateScore() map[model.UserID]int {
+func (ctx *Context) CalculateScore(turn int) map[model.UserID]int {
 	// max index = 4
 	scoreTable := []int{50, 40, 30, 20, 10}
 	scores := make(map[model.UserID]int, len(ctx.Participants))
-	for i, correctUsers := range ctx.correctUsers[ctx.turn] {
+	for i, correctUsers := range ctx.correctUsers[turn] {
 		for _, userId := range correctUsers {
 			scores[userId] = scoreTable[i]
 		}
