@@ -156,11 +156,12 @@ func (r *Room) handleMessagesFromAnswerer() {
 		for _, participant := range r.context.Participants {
 			select {
 			case m := <-r.clients[participant].receiver:
-				if participant == r.context.Questioner {
-					continue
-				}
 				switch m.Command {
 				case CmdClientAnswer:
+					// Answerを出すのは回答者のみ
+					if participant == r.context.Questioner {
+						continue
+					}
 					// userNameの取得
 					userName := r.clients[participant].name
 					// answerの取得
@@ -173,8 +174,12 @@ func (r *Room) handleMessagesFromAnswerer() {
 						},
 					})
 					return
+				// 回答者の回答を出題者が採点する時
 				// 回答者が自身の正誤を確認した時
 				case CmdClientCorrectUsers:
+					if participant != r.context.Questioner {
+						continue
+					}
 					correctUsers := m.Content.(ClientMsgCorrectUsers)
 					r.broadCast(&RoomMessage{
 						Command: CmdRoomCorrectUsers,
