@@ -59,8 +59,7 @@ func (r *Room) run() {
 		r.getDescriptions()                    // ChatGPTにQuestionを投げる
 		for i := 0; i < 5; i++ {
 			r.sendDescription(i)
-			r.handleMessagesFromAnswerer()            //Answererの回答を待つ→出題者に逐次送る
-			r.handleMessagesQuestionerCheck()         //採点を待つ→スコアを回答者に送る
+			r.handleMessagesFromAnswerer()            //Answererの回答を待つ→出題者に逐次送る or 採点を待つ→スコアを回答者に送る
 			done := r.handleMessagesNextDescription() //game_next_description/game_questioner_doneを待つ
 			if done {
 				break
@@ -151,16 +150,51 @@ func (r *Room) sendDescription(index int) {
 	r.broadCast(&message)
 }
 
-//採点を待つ→スコアを回答者に送る
+// Answererの回答を待つ→出題者に逐次送る
 func (r *Room) handleMessagesFromAnswerer() {
-
+	for {
+		for _, participant := range r.context.Participants {
+			select {
+			case m := <-r.clients[participant].receiver:
+				switch m.Command {
+				case CmdClientAnswer:
+					// Answerを出すのは回答者のみ
+					if participant == r.context.Questioner {
+						continue
+					}
+					// userNameの取得
+					userName := r.clients[participant].name
+					// answerの取得
+					answer := m.Content.(ClientMsgAnswer)
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomAnswer,
+						Content: RoomAnswer{
+							userName: userName,
+							answer:   string(answer),
+						},
+					})
+					return
+				// 回答者の回答を出題者が採点する時
+				// 回答者が自身の正誤を確認した時
+				case CmdClientCorrectUsers:
+					if participant != r.context.Questioner {
+						continue
+					}
+					correctUsers := m.Content.(ClientMsgCorrectUsers)
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomCorrectUsers,
+						Content: correctUsers,
+					})
+					return
+				default:
+				}
+			default:
+			}
+		}
+	}
 }
 
-func (r *Room) handleMessagesQuestionerCheck() {
-
-}
-
-//game_next_description/game_questioner_doneを待つ
+// game_next_description/game_questioner_doneを待つ
 // game_questioner_doneならtrueを返す
 func (r *Room) handleMessagesNextDescription() bool {
 	return false
@@ -185,7 +219,7 @@ func (r *Room) showResult() {
 	})
 }
 
-//game_next_game/game_finish_gameを待つ, 出題者変更
+// game_next_game/game_finish_gameを待つ, 出題者変更
 // game_finish_gameなら trueを返す
 func (r *Room) handleNextGame() bool {
 	for {
