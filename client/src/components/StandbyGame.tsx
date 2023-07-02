@@ -118,8 +118,8 @@ export const StandbyGame: FC<Props> = (props) => {
   }
 
   const userList = [];
-  for (const userName of userNames) {
-    userList.push(<StyledUser>{userName}</StyledUser>);
+  for (const [idx, userName] of userNames.entries()) {
+    userList.push(<StyledUser key={idx}>{userName}</StyledUser>);
   }
 
   // オーナー

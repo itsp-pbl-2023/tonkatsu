@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { StandbyGame } from "../components/StandbyGame";
 import { Questioner } from "../components/Questioner";
+import { Result } from "../components/Result";
 import { useSelector } from "react-redux";
 
 export const GameState = {
@@ -47,6 +48,11 @@ export const Game = function () {
       );
     case GameState.Answerer:
     case GameState.Result:
+      return (
+        <>
+          <Result socketRef={socketRef} setGameState={setGameState} />
+        </>
+      );
     default:
       break;
   }
