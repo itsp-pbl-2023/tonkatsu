@@ -51,7 +51,10 @@ export const StandbyGame: FC<Props> = (props) => {
               setUserNames(msg["content"]["user_name"]);
               break;
             case "start_game":
-              moveGame();
+              if (msg["content"]["isQuestioner"])
+                props.setGameState(GameState.Questioner);
+              else
+                props.setGameState(GameState.Answerer);
               break;
           }
           setStatus(2);
@@ -60,15 +63,10 @@ export const StandbyGame: FC<Props> = (props) => {
     }
   }, []);
 
-  const moveGame = function () {
-    // ゲーム画面への移動
-  };
-
   const startGame = function () {
     // ゲームを開始するとき
     var sendJson = { command: "start_game" };
     socketRef.current?.send(JSON.stringify(sendJson));
-    // props.setGameState(GameState.Answerer);
   };
 
   const cancelGame = function () {
