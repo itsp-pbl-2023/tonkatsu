@@ -86,6 +86,9 @@ func (ctx *Context) CalculateFinalScore() map[model.UserID]int {
 
 	turnLength := len(ctx.correctUsers)
 	totalScores := make(map[model.UserID]int, len(ctx.Participants))
+	for _, userId := range ctx.Participants {
+		totalScores[userId] = 0
+	}
 	for i := 0; i < turnLength; i++ {
 		scores := ctx.CalculateScore(uint(i))
 
