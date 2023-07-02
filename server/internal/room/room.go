@@ -126,7 +126,7 @@ func (r *Room) setParticipants() {
 func (r *Room) tellRoles() {
 	var questionerID userID
 	questionerID = r.context.SelectQuestioner()
-	r.broadCast(&RoomMessage{Command: CmdRoomQuestioner, Content: questionerID})
+	r.broadCast(&RoomMessage{Command: CmdRoomQuestioner, Content: RoomQuestioner(questionerID)})
 }
 
 func (r *Room) handleMessagesFromQuestioner() {
@@ -195,7 +195,7 @@ func (r *Room) handleMessagesFromAnswerer() {
 					correctUsers := m.Content.(ClientMsgCorrectUsers)
 					r.broadCast(&RoomMessage{
 						Command: CmdRoomCorrectUsers,
-						Content: correctUsers,
+						Content: RoomCorrectUsers(correctUsers),
 					})
 					return
 				default:
@@ -295,6 +295,7 @@ func (r *Room) showAllResults() {
 	message := RoomMessage{Command: CmdRoomFinalResult, Content: results}
 	r.broadCast(&message)
 }
+
 func (r *Room) close() {
 	for _, client := range r.clients {
 		client.sender <- &RoomMessage{

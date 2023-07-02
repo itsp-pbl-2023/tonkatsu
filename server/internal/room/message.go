@@ -13,7 +13,7 @@ type RoomMsgCommand int
 
 const (
 	// 部屋にいるユーザー
-	// Content: UsersInRoom
+	// Content: RoomUsers
 	CmdRoomUsersInRoom = RoomMsgCommand(iota)
 	// 部屋を閉じる
 	// Content: nil
