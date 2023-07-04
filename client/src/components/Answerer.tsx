@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import styled from "styled-components";
 import { GameState, ResultJson } from "../views/Game";
-import { DescriptionList, CorrectUserList } from "./GameComponents";
+import { Explanation, DescriptionList, CorrectUserList } from "./GameComponents";
 import { useCookies } from "react-cookie";
 
 const AnswerState = {
@@ -51,10 +51,10 @@ export const Answerer: FC<Props> = (props) => {
   const socketRef = props.socketRef;
   var flag = 0;
   const [status, setStatus] = useState<AnswerState>(AnswerState.WaitQuestionerAnswer);
-  const [explanations, setExplanations] = useState([]);
+  const [explanations, setExplanations] = useState<Explanation[]>([]);
   const [answer, setAnswer] = useState("");
   const [userid] = useCookies(["userID"]);
-  const [correctUserList, setCorrectUserList] = useState([]);
+  const [correctUserList, setCorrectUserList] = useState<string[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
 
   // WebSocket
@@ -85,7 +85,7 @@ export const Answerer: FC<Props> = (props) => {
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
               for (const correctUser of correctUserList) {
-                if (correctUser === userid)
+                if (correctUser == userid)
                   setIsCorrect(true);
               }
               setStatus(AnswerState.Result);
@@ -134,7 +134,7 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <DescriptionList contents={explanations}></DescriptionList>
+          <DescriptionList explanations={explanations}></DescriptionList>
           <StyledForm>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div>
@@ -174,7 +174,7 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <DescriptionList contents={explanations}></DescriptionList>
+          <DescriptionList explanations={explanations}></DescriptionList>
           <p>あなたの解答</p>
           <h2>{answer}</h2>
         </StyledPage>

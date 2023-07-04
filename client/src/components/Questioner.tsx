@@ -5,6 +5,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import { HStack, VStack } from "@chakra-ui/react";
 import styled from "styled-components";
 import { GameState, ResultJson } from "../views/Game";
+import { Explanation, DescriptionList, CorrectUserList } from "./GameComponents";
 
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
@@ -26,11 +27,6 @@ type Answerer = {
   answer: string;
   isCorrect: number;
 };
-
-type Explanation = {
-  description: string;
-  index: number;
-}
 
 export const Questioner: FC<Props> = (props) => {
   const {
@@ -149,8 +145,8 @@ export const Questioner: FC<Props> = (props) => {
       content: { correctUserList },
     };
     socketRef.current?.send(JSON.stringify(sendJsonCheck));
-    var sendJsonNext = { command: "game_next_description" };
-    socketRef.current?.send(JSON.stringify(sendJsonNext));
+    // var sendJsonNext = { command: "game_next_description" };
+    // socketRef.current?.send(JSON.stringify(sendJsonNext));
     setAnswerers([]);
   };
 
@@ -166,8 +162,8 @@ export const Questioner: FC<Props> = (props) => {
       content: { correctUserList },
     };
     socketRef.current?.send(JSON.stringify(sendJsonCheck));
-    var sendJson = { command: "game_questioner_done" };
-    socketRef.current?.send(JSON.stringify(sendJson));
+    // var sendJson = { command: "game_questioner_done" };
+    // socketRef.current?.send(JSON.stringify(sendJson));
     props.setGameState(GameState.Result);
   };
 
