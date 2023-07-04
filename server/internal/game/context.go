@@ -91,6 +91,11 @@ func (ctx *Context) CalculateScore(turn uint) map[model.UserID]int {
 			scores[userId] = scoreTable[i]
 		}
 	}
+	for _, userId := range ctx.Participants {
+		if _, correct := scores[userId]; !correct {
+			scores[userId] = 0
+		}
+	}
 	return scores
 }
 
