@@ -140,7 +140,8 @@ export const Questioner: FC<Props> = (props) => {
   const next_explanation = () => {
     const correctUserList: string[] = [];
     for (const answerer of answerers) {
-      if (answerer.isCorrect == 1) correctUserList.concat(answerer.user);
+      if (answerer.isCorrect == 1) 
+        correctUserList.push(answerer.user);
     }
     var sendJsonCheck = {
       command: "game_questioner_check",
