@@ -20,7 +20,7 @@ export type ResultJson = {
   command: string; 
   content: {
     result: {
-      username: string;
+      userName: string;
       score: number;
     }[]; 
     question: string; 
@@ -31,7 +31,14 @@ export type ResultJson = {
 export const Game = function () {
   const roomid = useSelector((state: any) => state.user.roomId);
   const [gameState, setGameState] = useState<GameState>(GameState.Init);
-  const [result, setResult] = useState<ResultJson>();
+  const [result, setResult] = useState<ResultJson>({
+    command: "", 
+  content: {
+    result: [], 
+    question: "", 
+    questioner: ""
+  }
+  });
 
   const socketRef = React.useRef<WebSocket>();
   var flag = 0;
@@ -48,8 +55,8 @@ export const Game = function () {
   }, []);
 
   const moveResult = (json: ResultJson) => {
-    setGameState(GameState.Result);
     setResult(json);
+    setGameState(GameState.Result);
   }
 
   switch (gameState) {
@@ -74,7 +81,7 @@ export const Game = function () {
     case GameState.Result:
       return (
         <>
-          <Result socketRef={socketRef} setGameState={setGameState} />
+          <Result socketRef={socketRef} setGameState={setGameState} result={result}/>
         </>
       );
     default:

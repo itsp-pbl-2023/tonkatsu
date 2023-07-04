@@ -1,12 +1,13 @@
 import React, { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, HStack, VStack } from "@chakra-ui/react";
-import { GameState } from "../views/Game";
+import { GameState, ResultJson } from "../views/Game";
 import styled from "styled-components";
 
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
   setGameState: (state: GameState) => void;
+  result: ResultJson;
 };
 
 type Userscore = {
@@ -30,34 +31,13 @@ export const Result: FC<Props> = (props) => {
     questioner: "tonkatsu",
     question: "とんかつ",
   });
-  const [gameResults, setGameResults] = useState<Userscore[]>([
-    {
-      userName: "a",
-      score: 0,
-    },
-    {
-      userName: "ton",
-      score: 3,
-    },
-    {
-      userName: "b",
-      score: 4,
-    },
-    {
-      userName: "katsu",
-      score: 2,
-    },
-    {
-      userName: "c",
-      score: 3,
-    },
-  ]);
+  const [gameResults, setGameResults] = useState<Userscore[]>([]);
 
   // status:
   // 0: WebSocket 接続前
   // 1: WebSocket 接続失敗
   // 2: WebSocket 接続成功
-  const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState(1);
 
   // WebSocket
   useEffect(() => {
@@ -81,14 +61,6 @@ export const Result: FC<Props> = (props) => {
         socketRef.current.onmessage = function (event) {
           var msg = JSON.parse(event.data);
           switch (msg["command"]) {
-            case "game_show_result":
-              const objTopic: Topic = {
-                questioner: msg["content"]["questioner"],
-                question: msg["content"]["question"],
-              };
-              setTopic(objTopic);
-              setGameResults(rank_array(msg["content"]["result"]));
-              break;
             case "game_show_all_result":
               setIsLast(true);
               setGameResults(rank_array(msg["content"]["result"]));
@@ -125,6 +97,13 @@ export const Result: FC<Props> = (props) => {
     }
     return rankedArray;
   };
+
+  const objTopic: Topic = {
+    questioner: props.result["content"]["questioner"],
+    question: props.result["content"]["question"],
+  };
+  setTopic(objTopic);
+  setGameResults(rank_array(props.result["content"]["result"]));
 
   const next_question = () => {
     var sendJson = { command: "game_next_game" };

@@ -51,16 +51,7 @@ export const Answerer: FC<Props> = (props) => {
   const socketRef = props.socketRef;
   var flag = 0;
   const [status, setStatus] = useState<AnswerState>(AnswerState.WaitQuestionerAnswer);
-  const [explanations, setExplanations] = useState([
-    {
-      description: "ここに質問が順次追加される↓",
-      index: 0,
-    },
-    {
-      description: "ここに質問が順次追加される↓",
-      index: 1,
-    },
-  ]);
+  const [explanations, setExplanations] = useState([]);
   const [answer, setAnswer] = useState("");
   const [userid] = useCookies(["userID"]);
   const [correctUserList, setCorrectUserList] = useState([]);
