@@ -53,7 +53,7 @@ export const Answerer: FC<Props> = (props) => {
   const [status, setStatus] = useState<AnswerState>(AnswerState.WaitQuestionerAnswer);
   const [explanations, setExplanations] = useState<Explanation[]>([]);
   const [answer, setAnswer] = useState("");
-  const [userid] = useCookies(["userID"]);
+  const [userid, setUserid, removeUserid] = useCookies(["userID"]);
   const [correctUserList, setCorrectUserList] = useState<string[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
 
@@ -84,8 +84,11 @@ export const Answerer: FC<Props> = (props) => {
               break;
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
-              for (const correctUser of correctUserList) {
-                if (correctUser == userid)
+              for (const correctUser of msg["content"]["correctUserList"]) {
+                console.log("correct: " + correctUser);
+                console.log("userid: " + userid.userID as string);
+                console.log("gen: " + userid.userID);
+                if (correctUser == userid.userID as string)
                   setIsCorrect(true);
               }
               setStatus(AnswerState.Result);
