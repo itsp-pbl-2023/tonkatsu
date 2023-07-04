@@ -85,9 +85,6 @@ export const Answerer: FC<Props> = (props) => {
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
               for (const correctUser of msg["content"]["correctUserList"]) {
-                console.log("correct: " + correctUser);
-                console.log("userid: " + userid.userID as string);
-                console.log("gen: " + userid.userID);
                 if (correctUser == userid.userID as string)
                   setIsCorrect(true);
               }
