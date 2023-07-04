@@ -16,9 +16,12 @@ export const GameState = {
 
 export type GameState = (typeof GameState)[keyof typeof GameState];
 
+export type ResultJson = {command: string, content: {result: [{username: string, score: number}], question: string, questioner: string}};
+
 export const Game = function () {
   const roomid = useSelector((state: any) => state.user.roomId);
   const [gameState, setGameState] = useState<GameState>(GameState.Init);
+  const [result, setResult] = useState<ResultJson>();
 
   const socketRef = React.useRef<WebSocket>();
   var flag = 0;
@@ -34,10 +37,10 @@ export const Game = function () {
     }
   }, []);
 
-  // const setResult = (json: {
-  //   command}) => {
-
-  // }
+  const moveResult = (json: ResultJson) => {
+    setGameState(GameState.Result);
+    setResult(json);
+  }
 
   switch (gameState) {
     case GameState.Standby:
@@ -55,7 +58,7 @@ export const Game = function () {
     case GameState.Answerer:
       return (
         <>
-          <Answerer socketRef={socketRef} setGameState={setGameState} />
+          <Answerer socketRef={socketRef} setGameState={setGameState} moveResult={moveResult} />
         </>
       );
     case GameState.Result:

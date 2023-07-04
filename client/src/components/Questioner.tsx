@@ -118,7 +118,7 @@ export const Questioner: FC<Props> = (props) => {
     var sendJson = {
       command: "game_questioner_question",
       content: {
-        topic,
+        topic: data.topic,
         question: data.question,
       },
     };

@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import styled from "styled-components";
-import { GameState } from "../views/Game";
+import { GameState, ResultJson } from "../views/Game";
 import { DescriptionList, CorrectUserList } from "./GameComponents";
 import { useCookies } from "react-cookie";
 
@@ -20,6 +20,7 @@ type AnswerState = (typeof AnswerState)[keyof typeof AnswerState];
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
   setGameState: (state: GameState) => void;
+  moveResult: (json: ResultJson) => void;
 };
 
 type Topic = {
