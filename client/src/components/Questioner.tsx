@@ -143,6 +143,7 @@ export const Questioner: FC<Props> = (props) => {
       if (answerer.isCorrect == 1) 
         correctUserList.push(answerer.user);
     }
+    console.log(correctUserList);
     var sendJsonCheck = {
       command: "game_questioner_check",
       content: { correctUserList },
@@ -154,6 +155,17 @@ export const Questioner: FC<Props> = (props) => {
   };
 
   const question_done = () => {
+    const correctUserList: string[] = [];
+    for (const answerer of answerers) {
+      if (answerer.isCorrect == 1) 
+        correctUserList.push(answerer.user);
+    }
+    console.log(correctUserList);
+    var sendJsonCheck = {
+      command: "game_questioner_check",
+      content: { correctUserList },
+    };
+    socketRef.current?.send(JSON.stringify(sendJsonCheck));
     var sendJson = { command: "game_questioner_done" };
     socketRef.current?.send(JSON.stringify(sendJson));
     props.setGameState(GameState.Result);
@@ -248,7 +260,7 @@ export const Questioner: FC<Props> = (props) => {
         ) : (
           <StyledForm>
             <p>質問：{topic}</p>
-            <form action="/" method="GET" onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <div>
                   <StyledInput
