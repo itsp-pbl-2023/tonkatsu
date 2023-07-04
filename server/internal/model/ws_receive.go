@@ -5,18 +5,22 @@ import (
 )
 
 type WSMessageToReceive struct {
-	Command string
-	Content interface{}
+	Command string      `json:"command"`
+	Content interface{} `json:"content"`
 }
 
 type WSContentQuestionerQuestion struct {
-	Topic    string
-	Question string
+	Topic    string `json:"topic"`
+	Question string `json:"question"`
 }
 
-type WSContentAnswererAnswer string
+type WSContentAnswererAnswer struct {
+	Answer string `json:"answer"`
+}
 
-type WSContentCorrectUserList []string
+type WSContentCorrectUserList struct {
+	CorrectUsersList []string `json:"correctUserList"`
+}
 
 const (
 	WSCmdLeave              = "leave"
