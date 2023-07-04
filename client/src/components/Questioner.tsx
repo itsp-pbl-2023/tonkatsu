@@ -20,11 +20,16 @@ type ButtonProps = {
   isCorrect?: boolean;
 };
 
-type answerer = {
+type Answerer = {
   user: string;
   answer: string;
   isCorrect: number;
 };
+
+type Explanation = {
+  description: string;
+  index: number;
+}
 
 export const Questioner: FC<Props> = (props) => {
   const {
@@ -55,16 +60,8 @@ export const Questioner: FC<Props> = (props) => {
   const [topic, setTopic] = useState(topics[rand()]);
   const [question, setQuestion] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [explanations, setExplanations] = useState([
-    {
-      description: "ここに質問が順次追加される↓",
-      index: 0,
-    },
-  ]);
-  const [answerers, setAnswerers] = useState<answerer[]>([
-    { user: "ton", answer: "とんかつ", isCorrect: 0 },
-    { user: "katsu", answer: "生姜焼き", isCorrect: 0 },
-  ]);
+  const [explanations, setExplanations] = useState<Explanation[]>([]);
+  const [answerers, setAnswerers] = useState<Answerer[]>([]);
   //const [errorMsg, setErrorMsg] = useState<string>("");
 
   // status:
@@ -94,7 +91,7 @@ export const Questioner: FC<Props> = (props) => {
               setExplanations(explanations.concat(msg["content"]));
               break;
             case "game_questioner_recieve":
-              const args: answerer = {
+              const args: Answerer = {
                 ...msg["content"],
                 isCorrect: 0,
               };
@@ -126,7 +123,7 @@ export const Questioner: FC<Props> = (props) => {
     reset();
   };
 
-  const judge = (flag: boolean, ans: answerer) => {
+  const judge = (flag: boolean, ans: Answerer) => {
     let idx = 0;
     for (const [index, answerer] of answerers.entries()) {
       if (ans.user == answerer.user) idx = index;

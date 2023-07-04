@@ -16,7 +16,17 @@ export const GameState = {
 
 export type GameState = (typeof GameState)[keyof typeof GameState];
 
-export type ResultJson = {command: string, content: {result: [{username: string, score: number}], question: string, questioner: string}};
+export type ResultJson = {
+  command: string; 
+  content: {
+    result: {
+      username: string;
+      score: number;
+    }[]; 
+    question: string; 
+    questioner: string
+  }
+};
 
 export const Game = function () {
   const roomid = useSelector((state: any) => state.user.roomId);
