@@ -186,7 +186,6 @@ func (r *Room) handleMessagesFromAnswerer() {
 							answer:   string(answer),
 						},
 					})
-					return
 				// 回答者の回答を出題者が採点する時
 				// 回答者が自身の正誤を確認した時
 				case CmdClientCorrectUsers:
