@@ -91,13 +91,13 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 			content := message.Content.(model.WSContentAnswererAnswer)
 			client.sender <- &ClientMessage{
 				Command: CmdClientAnswer,
-				Content: ClientMsgAnswer(content),
+				Content: ClientMsgAnswer(content.Answer),
 			}
 		case model.WSCmdQuestionerCheck:
 			content := message.Content.(model.WSContentCorrectUserList)
 			client.sender <- &ClientMessage{
 				Command: CmdClientCorrectUsers,
-				Content: ClientMsgCorrectUsers(content),
+				Content: ClientMsgCorrectUsers(content.CorrectUsersList),
 			}
 		case model.WSCmdNextDescription:
 			client.sender <- &ClientMessage{
