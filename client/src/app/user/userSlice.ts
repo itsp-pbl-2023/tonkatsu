@@ -9,8 +9,8 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    becomeOwner: (state) => {
-      state.isOwner = true;
+    becomeOwner: (state, action) => {
+      state.isOwner = action.payload;
     },
     createRoom: (state, action) => {
       if (action.payload !== "") {
