@@ -62,7 +62,7 @@ export const Game = function () {
     case GameState.Questioner:
       return (
         <>
-          <Questioner socketRef={socketRef} setGameState={setGameState} />
+          <Questioner socketRef={socketRef} setGameState={setGameState} moveResult={moveResult}/>
         </>
       );
     case GameState.Answerer:
