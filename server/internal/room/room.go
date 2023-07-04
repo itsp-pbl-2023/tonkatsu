@@ -158,6 +158,7 @@ func (r *Room) getDescriptions() {
 }
 
 func (r *Room) sendDescription(index int) {
+	r.context.StartAnswering(index)
 	message := RoomMessage{Command: CmdRoomDescription, Content: RoomDescription{Description: r.context.Descriptions[index], Index: index}}
 	r.broadCast(&message)
 }
@@ -193,6 +194,7 @@ func (r *Room) handleMessagesFromAnswerer() {
 						continue
 					}
 					correctUsers := m.Content.(ClientMsgCorrectUsers)
+					r.context.AddCorrectUsers(r.mapUserNamesToUserIds(correctUsers))
 					r.broadCast(&RoomMessage{
 						Command: CmdRoomCorrectUsers,
 						Content: RoomCorrectUsers(correctUsers),
@@ -343,4 +345,16 @@ func (r *Room) userNames() RoomUsers {
 		names = append(names, client.name)
 	}
 	return names
+}
+
+func (r *Room) mapUserNamesToUserIds(userNames []string) []UserID {
+	nameToUserId := make(map[string]UserID, len(r.clients))
+	userIds := make([]UserID, 0, len(userNames))
+	for userId, client := range r.clients {
+		nameToUserId[client.name] = userId
+	}
+	for _, userName := range userNames {
+		userIds = append(userIds, nameToUserId[userName])
+	}
+	return userIds
 }

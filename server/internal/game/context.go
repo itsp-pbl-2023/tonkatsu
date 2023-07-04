@@ -12,7 +12,7 @@ type Context struct {
 	Participants []model.UserID // 参加者
 	// あるお題に対して何個目の説明を表示しているか.
 	// zero-based index
-	index        uint
+	index        int
 	topic        string       // 問題「好きな食べ物は？」など
 	Questioner   model.UserID // 質問者
 	Question     string       // お題
@@ -31,7 +31,7 @@ func NewContext() *Context {
 		Questioner:   0,
 		Question:     "",
 		Descriptions: make([]string, 0),
-		correctUsers: make([][][]model.UserID, 0),
+		correctUsers: make([][][]model.UserID, 1),
 	}
 	return new
 }
@@ -45,6 +45,11 @@ func (ctx *Context) SelectQuestioner() model.UserID {
 func (ctx *Context) SetPhase(p phase) {
 	ctx.phase = p
 	return
+}
+
+func (ctx *Context) StartAnswering(index int) {
+	ctx.index = index
+	ctx.correctUsers[ctx.turn] = append(ctx.correctUsers[ctx.turn], make([]model.UserID, 0))
 }
 
 func (ctx *Context) SetQuestioner(questionerID model.UserID) {
@@ -70,6 +75,11 @@ func (ctx *Context) CurrentTurn() uint {
 func (ctx *Context) NextTurn() {
 	ctx.turn += 1
 	ctx.SelectQuestioner()
+	ctx.correctUsers = append(ctx.correctUsers, make([][]model.UserID, 0))
+}
+
+func (ctx *Context) AddCorrectUsers(correctUsers []model.UserID) {
+	ctx.correctUsers[ctx.turn][ctx.index] = correctUsers
 }
 
 func (ctx *Context) CalculateScore(turn uint) map[model.UserID]int {
