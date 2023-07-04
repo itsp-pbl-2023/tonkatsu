@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import { HStack, VStack } from "@chakra-ui/react";
 import styled from "styled-components";
-import { GameState } from "../views/Game";
+import { GameState, ResultJson } from "../views/Game";
 
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
   setGameState: (state: GameState) => void;
+  moveResult: (json: ResultJson) => void;
 };
 
 type Topic = {
@@ -97,6 +98,9 @@ export const Questioner: FC<Props> = (props) => {
               };
               setAnswerers(answerers.concat(args));
               break;
+            case "game_show_result":
+                props.moveResult(msg);
+                break;
           }
         };
         setStatus(2);
