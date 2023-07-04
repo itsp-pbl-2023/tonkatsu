@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -41,10 +42,9 @@ type Usage struct {
 }
 
 func CallChatGPT(message string) string {
-	// SET YOUR API KEY
-	apiKey := "YOUR_API_KEY"
+	apiKey := os.Getenv(("OPENAI_API_KEY"))
 
-	if apiKey == "YOUR_API_KEY" {
+	if apiKey == "" {
 		stub := "1. フライされた豚肉の切り身が主要な要素であり、食べる際にはサクサクとした食感が楽しめる。\n2. 豚肉は、衣と呼ばれる層に包まれており、これによって豚肉の柔らかさが保たれる。\n3. 豚肉の外側は、衣の色とりどりの美しい表面で覆われており、食欲をそそる見た目となっている。\n4. 豚肉の香りや食材の風味が引き立てられ、一緒に添えられるソースやキャベツとの相性も良い。\n5. 一般的には、ごはんや味噌汁といった伝統的な料理と組み合わせて食べられることが多い。"
 		return stub
 	}
