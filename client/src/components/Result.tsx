@@ -28,8 +28,8 @@ export const Result: FC<Props> = (props) => {
 
   const [isLast, setIsLast] = useState(false);
   const [topic, setTopic] = useState<Topic>({
-    questioner: "tonkatsu",
-    question: "とんかつ",
+    questioner: "",
+    question: "",
   });
   const [gameResults, setGameResults] = useState<Userscore[]>([]);
 
@@ -74,6 +74,13 @@ export const Result: FC<Props> = (props) => {
         };
         setStatus(2);
       }
+
+      const objTopic: Topic = {
+        questioner: props.result["content"]["questioner"],
+        question: props.result["content"]["question"],
+      };
+      setTopic(objTopic);
+      setGameResults(rank_array(props.result["content"]["result"]));
     }
   }, []);
 
@@ -97,13 +104,6 @@ export const Result: FC<Props> = (props) => {
     }
     return rankedArray;
   };
-
-  const objTopic: Topic = {
-    questioner: props.result["content"]["questioner"],
-    question: props.result["content"]["question"],
-  };
-  setTopic(objTopic);
-  setGameResults(rank_array(props.result["content"]["result"]));
 
   const next_question = () => {
     var sendJson = { command: "game_next_game" };
