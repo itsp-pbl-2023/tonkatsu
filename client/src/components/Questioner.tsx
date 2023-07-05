@@ -7,7 +7,6 @@ import styled from "styled-components";
 import { GameState, ResultJson } from "../views/Game";
 import { Explanation, DescriptionList, CorrectUserList } from "./GameComponents";
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
 
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
@@ -75,7 +74,6 @@ export const Questioner: FC<Props> = (props) => {
   const [explanations, setExplanations] = useState<Explanation[]>([]);
   const [answerers, setAnswerers] = useState<Answerer[]>([]);
   const [correctUserList, setCorrectUserList] = useState<string[]>([]);
-  //const [errorMsg, setErrorMsg] = useState<string>("");
 
   const [status, setStatus] = useState<QuestionerState>(QuestionerState.SubmittingQuestion);
 
@@ -145,24 +143,20 @@ export const Questioner: FC<Props> = (props) => {
       if (ans.user == answerer.user) idx = index;
     }
     const array = answerers;
-    var correctCount = 0;
-    if (flag) {
-      array[idx].isCorrect = 1;
-      correctCount++;
-    } else {
-      array[idx].isCorrect = 2;
-    }
     array[idx].isCorrect = flag ? 1 : 2;
     setAnswerers([...array]);
 
     // 全員の解答の正誤判定が終わったら
     if (answererNum == answerers.length) {
-      setAnswererNum(answererNum - correctCount);
       const correctUserList: string[] = [];
+      let correctCount = 0;
       for (const answerer of answerers) {
-        if (answerer.isCorrect == 1) 
+        if (answerer.isCorrect == 1) {
           correctUserList.push(answerer.user);
+          correctCount++;
+        }
       }
+      setAnswererNum(answererNum - correctCount);
       var sendJsonCheck = {
         command: "game_questioner_check",
         content: { correctUserList },
@@ -287,7 +281,7 @@ export const Questioner: FC<Props> = (props) => {
             <CorrectUserList correctUsers={correctUserList}></CorrectUserList>
             <StyledHr />
             <HStack>
-              { answererNum == 0 ? (
+              { answererNum > 0 ? (
                 <StyledButton onClick={next_explanation}>
                   次の説明に移る
                 </StyledButton>
