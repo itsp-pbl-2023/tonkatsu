@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { StandbyGame } from "../components/StandbyGame";
 import { Questioner } from "../components/Questioner";
 import { Result } from "../components/Result";
+import { AllResult } from "../components/AllResult";
 import { Answerer } from "../components/Answerer";
 import { useSelector } from "react-redux";
 
@@ -12,6 +13,7 @@ export const GameState = {
   Questioner: 2,
   Answerer: 3,
   Result: 4,
+  AllResult: 5,
 };
 
 export type GameState = (typeof GameState)[keyof typeof GameState];
@@ -28,6 +30,16 @@ export type ResultJson = {
   }
 };
 
+export type AllResultJson = {
+  command: string; 
+  content: {
+    result: {
+      userName: string;
+      score: number;
+    }[];
+  }
+};
+
 export const Game = function () {
   const roomid = useSelector((state: any) => state.user.roomId);
   const [gameState, setGameState] = useState<GameState>(GameState.Init);
@@ -37,6 +49,12 @@ export const Game = function () {
     result: [], 
     question: "", 
     questioner: ""
+  }
+  });
+  const [allResult, setAllResult] = useState<AllResultJson>({
+    command: "", 
+  content: {
+    result: [],
   }
   });
 
@@ -57,6 +75,11 @@ export const Game = function () {
   const moveResult = (json: ResultJson) => {
     setResult(json);
     setGameState(GameState.Result);
+  }
+
+  const moveAllResult = (json: AllResultJson) => {
+    setAllResult(json);
+    setGameState(GameState.AllResult);
   }
 
   switch (gameState) {
@@ -81,7 +104,13 @@ export const Game = function () {
     case GameState.Result:
       return (
         <>
-          <Result socketRef={socketRef} setGameState={setGameState} result={result}/>
+          <Result socketRef={socketRef} setGameState={setGameState} result={result} moveAllResult={moveAllResult}/>
+        </>
+      );
+    case GameState.AllResult:
+      return (
+        <>
+          <AllResult setGameState={setGameState} result={allResult}/>
         </>
       );
     default:
