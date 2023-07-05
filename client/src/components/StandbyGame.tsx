@@ -17,7 +17,8 @@ export const StandbyGame: FC<Props> = (props) => {
   const dispatch = useDispatch();
   console.log(isOwner);
   const socketRef = props.socketRef;
-  const [userNames, setUserNames] = useState([]);
+  const [userNames, setUserNames] = useState<string[]>([]);
+  const [userNum, setUserNum] = useState<number>(2);
   const navigate = useNavigate();
   var flag = 0;
 
@@ -51,10 +52,11 @@ export const StandbyGame: FC<Props> = (props) => {
             case "update_members":
               console.log(msg["content"]["user_name"]);
               setUserNames(msg["content"]["user_name"]);
+              setUserNum(msg["content"]["user_name"].length);
               break;
             case "role":
               if (isOwner)
-                dispatch(setJoinNum(userNames.length));
+                dispatch(setJoinNum(userNum));
               if (msg["content"]["isQuestioner"])
                 props.setGameState(GameState.Questioner);
               else
@@ -76,6 +78,7 @@ export const StandbyGame: FC<Props> = (props) => {
   const cancelGame = function () {
     // ゲームをキャンセルするとき
     localStorage.removeItem("isOwner");
+    socketRef.current?.close();
     props.setGameState(GameState.Init);
     navigate("/");
   };
