@@ -230,7 +230,7 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					}
 				}
 				err := client.writeJSONWithLog(&model.WSMessageToSend{
-					Command: model.WSCmdSendResults,
+					Command: model.WSCmdSendFinalResults,
 					Content: model.SendFinalResults{
 						Result: sendResults,
 					},
