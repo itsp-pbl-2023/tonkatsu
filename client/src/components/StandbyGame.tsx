@@ -55,8 +55,7 @@ export const StandbyGame: FC<Props> = (props) => {
               setUserNum(msg["content"]["user_name"].length);
               break;
             case "role":
-              if (isOwner)
-                dispatch(setJoinNum(userNum));
+              dispatch(setJoinNum(userNum));
               if (msg["content"]["isQuestioner"])
                 props.setGameState(GameState.Questioner);
               else
