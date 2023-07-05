@@ -185,7 +185,6 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <h2>正解者</h2>
           <CorrectUserList correctUsers={correctUserList}></CorrectUserList>
           <p>あなたは...</p>
           <h2>{isCorrect ? ("正解!") : ("違うよ!")}</h2>

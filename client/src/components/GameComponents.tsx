@@ -35,6 +35,7 @@ export const CorrectUserList: FC<CorrectUserProps> = (props) => {
 
   return (
     <>
+      <h2>正解者</h2>
       <div>{correctUserList}</div>
     </>
   )
