@@ -2,7 +2,8 @@ import { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setJoinNum } from "../app/user/userSlice";
 import { GameState } from "../views/Game";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 export const StandbyGame: FC<Props> = (props) => {
   const roomid = useSelector((state: any) => state.user.roomId);
   const isOwner = useSelector((state: any) => state.user.isOwner);
+  const dispatch = useDispatch();
   console.log(isOwner);
   const socketRef = props.socketRef;
   const [userNames, setUserNames] = useState([]);
@@ -51,6 +53,8 @@ export const StandbyGame: FC<Props> = (props) => {
               setUserNames(msg["content"]["user_name"]);
               break;
             case "role":
+              if (isOwner)
+                dispatch(setJoinNum(userNames.length));
               if (msg["content"]["isQuestioner"])
                 props.setGameState(GameState.Questioner);
               else
