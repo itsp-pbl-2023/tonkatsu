@@ -24,6 +24,8 @@ const (
 	WSCmdSendResults = "game_show_result"
 	// Content: SendFinalResults
 	WSCmdSendFinalResults = "game_show_all_result"
+	// Content: nil
+	WSCmdSendDisconnect = "game_disconnect"
 )
 
 type UpdateMembers struct {

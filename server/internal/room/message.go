@@ -39,6 +39,9 @@ const (
 	// 全体のリザルト
 	// Content: []RoomFinalResult
 	CmdRoomFinalResult
+	// ゲーム接続の切断
+	// Content: nil
+	CmdRoomDisconnect
 )
 
 // 部屋にいるユーザ名のリスト
@@ -114,6 +117,9 @@ const (
 	// ゲーム終了
 	// Content: nil
 	CmdClientFinishGame
+	// ゲーム中の接続終了
+	// Content: nil
+	CmdClientDisconnect
 )
 
 type ClientMsgGameMode string
