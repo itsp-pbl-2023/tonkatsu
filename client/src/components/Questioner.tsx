@@ -67,6 +67,7 @@ export const Questioner: FC<Props> = (props) => {
 
   const joinNum = useSelector((state: any) => state.user.joinNum);
   const allAnswererNum = joinNum - 1;
+  console.log(allAnswererNum);
   const [answererNum, setAnswererNum] = useState<number>(allAnswererNum);
 
   const [topic, setTopic] = useState(topics[rand()]);
@@ -161,7 +162,8 @@ export const Questioner: FC<Props> = (props) => {
           correctCount++;
         }
       }
-      setAnswererNum(answererNum - correctCount);
+      console.log(correctCount, answererNum);
+      setAnswererNum((answererNum) => answererNum - correctCount);
       var sendJsonCheck = {
         command: "game_questioner_check",
         content: { correctUserList },
