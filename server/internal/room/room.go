@@ -145,6 +145,8 @@ func (r *Room) handleMessagesFromQuestioner() {
 						r.context.SetQuestion(question)
 						return
 					}
+				case CmdClientDisconnect:
+				panic("disconnected");
 				default:
 				}
 			default:
@@ -199,6 +201,8 @@ func (r *Room) handleMessagesFromAnswerer() {
 						Content: RoomCorrectUsers(correctUsers),
 					})
 					return
+				case CmdClientDisconnect:
+				panic("disconnect");
 				default:
 				}
 			default:
@@ -225,6 +229,8 @@ func (r *Room) handleMessagesNextDescription() bool {
 					if userId == r.context.Questioner {
 						return true
 					}
+				case CmdClientDisconnect:
+				panic("disconnect");
 				default:
 					return false
 				}
@@ -272,6 +278,8 @@ func (r *Room) handleNextGame() bool {
 						break
 					}
 					return true
+				case CmdClientDisconnect:
+				panic("disconnect");
 				default:
 				}
 			default:
@@ -298,10 +306,14 @@ func (r *Room) showAllResults() {
 }
 
 func (r *Room) close() {
-	for _, client := range r.clients {
-		client.sender <- &RoomMessage{
-			Command: CmdRoomClose,
-			Content: nil,
+	err := recover()
+	if err != nil {
+		// err が disconnect ならブロードキャストする
+		if err == "disconnect" {
+			r.broadCast(&RoomMessage{
+				Command: CmdRoomDisconnect,
+				Content: nil,
+			})
 		}
 	}
 	ra.deleteRoom(r.id)
