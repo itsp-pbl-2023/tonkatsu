@@ -95,7 +95,11 @@ export const Questioner: FC<Props> = (props) => {
           var msg = JSON.parse(event.data);
           switch (msg["command"]) {
             case "game_description":
-              setExplanations(explanations.concat(msg["content"]));
+              const emptyArray: Answerer[] = [];
+              setAnswerers([...emptyArray])
+              const pushedExplanationArray = explanations;
+              pushedExplanationArray.push(msg["content"]);
+              setExplanations(pushedExplanationArray);
               setStatus(QuestionerState.JudgingAnswer);
               break;
             case "game_questioner_recieve":
@@ -103,7 +107,9 @@ export const Questioner: FC<Props> = (props) => {
                 ...msg["content"],
                 isCorrect: 0,
               };
-              setAnswerers(answerers.concat(args));
+              const pushedAnswererArray = answerers;
+              pushedAnswererArray.push(args);
+              setAnswerers([...pushedAnswererArray]);
               break;
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
