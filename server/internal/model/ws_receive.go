@@ -9,6 +9,10 @@ type WSMessageToReceive struct {
 	Content interface{} `json:"content"`
 }
 
+type WSContentGameMode struct {
+	GameMode string `json:"game_mode"`
+}
+
 type WSContentQuestionerQuestion struct {
 	Topic    string `json:"topic"`
 	Question string `json:"question"`
@@ -45,6 +49,12 @@ func UnMarshalJSON(m []byte) (WSMessageToReceive, error) {
 		return messageRceive, err
 	}
 	switch messageRceive.Command {
+	case WSCmdStartGame:
+		var content WSContentGameMode
+		if err := json.Unmarshal(message, &content); err != nil {
+			return messageRceive, err
+		}
+		messageRceive.Content = content
 	case WSCmdQuestionerQuestion:
 		var content WSContentQuestionerQuestion
 		if err := json.Unmarshal(message, &content); err != nil {

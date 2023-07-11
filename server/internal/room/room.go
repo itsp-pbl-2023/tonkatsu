@@ -114,6 +114,7 @@ func (r *Room) handleMessagesInWaiting() bool {
 					r.finish()
 					return true
 				case CmdClientStartGame:
+					r.context.GameMode = string(m.Content.(ClientMsgGameMode))
 					return false
 				default:
 				}
@@ -162,7 +163,7 @@ func (r *Room) handleMessagesFromQuestioner() {
 }
 
 func (r *Room) getDescriptions() {
-	r.context.Descriptions = chatgpt.AskChatGPT(r.context.Question)
+	r.context.Descriptions = chatgpt.AskChatGPT(r.context.Question, r.context.GameMode)
 }
 
 func (r *Room) sendDescription(index int) {

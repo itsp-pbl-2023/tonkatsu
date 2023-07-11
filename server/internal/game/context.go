@@ -20,6 +20,7 @@ type Context struct {
 	// 正解したユーザのリスト
 	//   correctUsers[turn][index][i]
 	correctUsers [][][]model.UserID
+	GameMode     string // 難易度
 }
 
 func NewContext() *Context {

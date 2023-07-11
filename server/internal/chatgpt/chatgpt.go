@@ -101,9 +101,25 @@ func CallChatGPT(message string) string {
 	return response.Choices[0].Messages.Content
 }
 
-func AskChatGPT(keyword string) []string {
-	prompt := "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。極めて抽象的に記述してください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+func AskChatGPT(keyword string, gamemode string) []string {
+	var prompt string
+	switch gamemode {
+	case "normal":
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。極めて抽象的に記述してください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+
+	case "easy":
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+	case "hard":
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。[[KEYWORD]]という言葉は絶対に使わないでください。分かりにくく書いてください。"
+	case "chinese":
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。中国語で書いてください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+	case "english":
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。英語で書いてください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+	default:
+		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。極めて抽象的に記述してください。[[KEYWORD]]という言葉は絶対に使わないでください。"
+	}
 	prompt = strings.Replace(prompt, "[[KEYWORD]]", keyword, -1)
+
 	response := CallChatGPT(prompt)
 
 	response = MaskKeyword(response, keyword)
