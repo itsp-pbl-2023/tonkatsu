@@ -87,6 +87,9 @@ const (
 	// 退室
 	// Content: nil
 	CmdClientLeaveRoom = ClientMsgCommand(iota)
+	// 部屋を閉じる
+	// Content: nil
+	CmdClientCloseRoom
 	// ゲーム開始
 	// Content: nil
 	CmdClientStartGame

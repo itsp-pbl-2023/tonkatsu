@@ -9,6 +9,8 @@ const (
 	// Content: UpdateMembers
 	WSCmdSendUpdateMembers = "update_members"
 	// Content: nil
+	WSCmdSendCloseRoom = "close_room"
+	// Content: nil
 	WSCmdSendStartGame = "start_game"
 	// Content: SendRole
 	WSCmdSendRole = "role"

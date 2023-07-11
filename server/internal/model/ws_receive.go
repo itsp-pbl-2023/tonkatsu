@@ -24,6 +24,7 @@ type WSContentCorrectUserList struct {
 
 const (
 	WSCmdLeave              = "leave"
+	WSCmdCloseRoom          = "close_room"
 	WSCmdStartGame          = "start_game"
 	WSCmdQuestionerQuestion = "game_questioner_question"
 	WSCmdAnswererAnswer     = "game_answerer_answer"

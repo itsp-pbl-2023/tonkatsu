@@ -54,6 +54,12 @@ export const StandbyGame: FC<Props> = (props) => {
               setUserNames(msg["content"]["user_name"]);
               setUserNum(msg["content"]["user_name"].length);
               break;
+            case "close_room":
+              localStorage.removeItem("isOwner");
+              socketRef.current?.close();
+              props.setGameState(GameState.Init);
+              navigate("/");
+              break;
             case "role":
               dispatch(setJoinNum(userNum));
               if (msg["content"]["isQuestioner"])
@@ -76,6 +82,8 @@ export const StandbyGame: FC<Props> = (props) => {
 
   const cancelGame = function () {
     // ゲームをキャンセルするとき
+    let sendJSON = { command: "close_room" }
+    socketRef.current?.send(JSON.stringify(sendJSON))
     localStorage.removeItem("isOwner");
     socketRef.current?.close();
     props.setGameState(GameState.Init);
