@@ -74,9 +74,10 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 		case model.WSCmdLeave:
 			return
 		case model.WSCmdStartGame:
+			content := message.Content.(model.WSContentGameMode)
 			client.sender <- &ClientMessage{
 				Command: CmdClientStartGame,
-				Content: nil,
+				Content: ClientMsgGameMode(content.GameMode),
 			}
 		case model.WSCmdQuestionerQuestion:
 			content := message.Content.(model.WSContentQuestionerQuestion)
