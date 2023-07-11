@@ -268,9 +268,7 @@ func (r *Room) handleNextGame() bool {
 					r.context.NextTurn()
 					return false
 				case CmdClientFinishGame:
-					if userId != r.context.Questioner {
-						break
-					}
+
 					return true
 				default:
 				}
