@@ -1,11 +1,13 @@
 import { FC } from "react";
 import styled from "styled-components";
 
+export type Explanation = {
+  description: string;
+  index: number;
+}
+
 type DescriptionProps = {
-  contents: {
-    description: string,
-    index: number,
-  }[];
+  explanations: Explanation[]
 };
 
 type CorrectUserProps = {
@@ -14,8 +16,8 @@ type CorrectUserProps = {
 
 export const DescriptionList: FC<DescriptionProps> = (props) => {
   const descriptionList = [];
-  for (const [index, content] of props.contents.entries()) {
-    descriptionList.push(<StyledUser key={index}>{content.description}</StyledUser>);
+  for (const content of props.explanations) {
+    descriptionList.push(<StyledUser key={content.index}>{content.description}</StyledUser>);
   }
 
   return (
@@ -33,6 +35,7 @@ export const CorrectUserList: FC<CorrectUserProps> = (props) => {
 
   return (
     <>
+      <h2>正解者</h2>
       <div>{correctUserList}</div>
     </>
   )

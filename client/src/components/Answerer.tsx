@@ -3,8 +3,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import styled from "styled-components";
-import { GameState } from "../views/Game";
-import { DescriptionList, CorrectUserList } from "./GameComponents";
+import { GameState, ResultJson } from "../views/Game";
+import { Explanation, DescriptionList, CorrectUserList } from "./GameComponents";
 import { useCookies } from "react-cookie";
 
 const AnswerState = {
@@ -20,6 +20,7 @@ type AnswerState = (typeof AnswerState)[keyof typeof AnswerState];
 type Props = {
   socketRef: React.MutableRefObject<WebSocket | undefined>;
   setGameState: (state: GameState) => void;
+  moveResult: (json: ResultJson) => void;
 };
 
 type Topic = {
@@ -50,19 +51,10 @@ export const Answerer: FC<Props> = (props) => {
   const socketRef = props.socketRef;
   var flag = 0;
   const [status, setStatus] = useState<AnswerState>(AnswerState.WaitQuestionerAnswer);
-  const [explanations, setExplanations] = useState([
-    {
-      description: "ここに質問が順次追加される↓",
-      index: 0,
-    },
-    {
-      description: "ここに質問が順次追加される↓",
-      index: 1,
-    },
-  ]);
+  const [explanations, setExplanations] = useState<Explanation[]>([]);
   const [answer, setAnswer] = useState("");
-  const [userid] = useCookies(["userID"]);
-  const [correctUserList, setCorrectUserList] = useState([]);
+  const [userid, setUserid, removeUserid] = useCookies(["userID"]);
+  const [correctUserList, setCorrectUserList] = useState<string[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
 
   // WebSocket
@@ -92,14 +84,15 @@ export const Answerer: FC<Props> = (props) => {
               break;
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
-              for (const correctUser of correctUserList) {
-                if (correctUser === userid)
+              for (const correctUser of msg["content"]["correctUserList"]) {
+                if (correctUser == userid.userID as string)
                   setIsCorrect(true);
               }
               setStatus(AnswerState.Result);
               break;
-            // case "game_show_result":
-            //   break;
+            case "game_show_result":
+              props.moveResult(msg);
+              break;
           }
         };
       }
@@ -141,7 +134,7 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <DescriptionList contents={explanations}></DescriptionList>
+          <DescriptionList explanations={explanations}></DescriptionList>
           <StyledForm>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div>
@@ -181,7 +174,7 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <DescriptionList contents={explanations}></DescriptionList>
+          <DescriptionList explanations={explanations}></DescriptionList>
           <p>あなたの解答</p>
           <h2>{answer}</h2>
         </StyledPage>
@@ -192,7 +185,6 @@ export const Answerer: FC<Props> = (props) => {
     return (
       <>
         <StyledPage>
-          <h2>正解者</h2>
           <CorrectUserList correctUsers={correctUserList}></CorrectUserList>
           <p>あなたは...</p>
           <h2>{isCorrect ? ("正解!") : ("違うよ!")}</h2>
