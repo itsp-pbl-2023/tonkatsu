@@ -10,7 +10,7 @@ type WSMessageToReceive struct {
 }
 
 type WSContentGameMode struct {
-	GameMode string `json"gamemode"`
+	GameMode string `json"game_mode"`
 }
 
 type WSContentQuestionerQuestion struct {
