@@ -67,12 +67,13 @@ export const Questioner: FC<Props> = (props) => {
 
   const joinNum = useSelector((state: any) => state.user.joinNum);
   const allAnswererNum = joinNum - 1;
+  console.log(allAnswererNum);
   const [answererNum, setAnswererNum] = useState<number>(allAnswererNum);
 
   const [topic, setTopic] = useState(topics[rand()]);
   const [question, setQuestion] = useState("");
   const [explanations, setExplanations] = useState<Explanation[]>([]);
-  const [answerers, setAnswerers] = useState<Answerer[]>([]);
+  const [answerers, setAnswerers] = useState<Answerer[]>(() => []);
   const [correctUserList, setCorrectUserList] = useState<string[]>([]);
 
   const [status, setStatus] = useState<QuestionerState>(QuestionerState.SubmittingQuestion);
@@ -95,7 +96,8 @@ export const Questioner: FC<Props> = (props) => {
           var msg = JSON.parse(event.data);
           switch (msg["command"]) {
             case "game_description":
-              setExplanations(explanations.concat(msg["content"]));
+              setAnswerers(() => []);
+              setExplanations((explanations) => explanations.concat(msg["content"]));
               setStatus(QuestionerState.JudgingAnswer);
               break;
             case "game_questioner_recieve":
@@ -103,7 +105,7 @@ export const Questioner: FC<Props> = (props) => {
                 ...msg["content"],
                 isCorrect: 0,
               };
-              setAnswerers(answerers.concat(args));
+              setAnswerers((answerers) => answerers.concat(args));
               break;
             case "game_answerer_checked":
               setCorrectUserList(msg["content"]["correctUserList"]);
@@ -139,15 +141,19 @@ export const Questioner: FC<Props> = (props) => {
 
   const judge = (flag: boolean, ans: Answerer) => {
     let idx = 0;
+    let judgedCnt = 0;
     for (const [index, answerer] of answerers.entries()) {
       if (ans.user == answerer.user) idx = index;
+      if (answerer.isCorrect != 0) judgedCnt++;
     }
     const array = answerers;
     array[idx].isCorrect = flag ? 1 : 2;
+    judgedCnt++;
     setAnswerers([...array]);
+    console.log(answererNum);
 
     // 全員の解答の正誤判定が終わったら
-    if (answererNum == answerers.length) {
+    if (judgedCnt == answerers.length) {
       const correctUserList: string[] = [];
       let correctCount = 0;
       for (const answerer of answerers) {
@@ -156,7 +162,8 @@ export const Questioner: FC<Props> = (props) => {
           correctCount++;
         }
       }
-      setAnswererNum(answererNum - correctCount);
+      console.log(correctCount, answererNum);
+      setAnswererNum((answererNum) => answererNum - correctCount);
       var sendJsonCheck = {
         command: "game_questioner_check",
         content: { correctUserList },
@@ -168,7 +175,6 @@ export const Questioner: FC<Props> = (props) => {
   const next_explanation = () => {
     var sendJsonNext = { command: "game_next_description" };
     socketRef.current?.send(JSON.stringify(sendJsonNext));
-    setAnswerers([]);
   };
 
   const question_done = () => {
