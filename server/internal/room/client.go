@@ -73,6 +73,11 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 		switch message.Command {
 		case model.WSCmdLeave:
 			return
+		case model.WSCmdCloseRoom:
+			client.sender <- &ClientMessage{
+				Command: CmdClientCloseRoom,
+				Content: nil,
+			}
 		case model.WSCmdStartGame:
 			client.sender <- &ClientMessage{
 				Command: CmdClientStartGame,
@@ -137,6 +142,10 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 		case m := <-client.receiver:
 			switch m.Command {
 			case CmdRoomClose:
+				client.writeJSONWithLog(&model.WSMessageToSend{
+					Command: model.WSCmdCloseRoom,
+					Content: nil,
+				})
 				return
 			case CmdRoomUsersInRoom:
 				userNames := m.Content.(RoomUsers)

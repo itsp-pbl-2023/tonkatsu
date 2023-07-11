@@ -81,6 +81,7 @@ func (r *Room) run() {
 		}
 	}
 	r.showAllResults()
+	r.finish()
 }
 
 // 待機中に送られてくるメッセージを処理する
@@ -105,6 +106,13 @@ func (r *Room) handleMessagesInWaiting() bool {
 						Command: CmdRoomUsersInRoom,
 						Content: names,
 					})
+				case CmdClientCloseRoom:
+					r.broadCast(&RoomMessage{
+						Command: CmdRoomClose,
+						Content: nil,
+					})
+					r.finish()
+					return true
 				case CmdClientStartGame:
 					return false
 				default:
@@ -295,6 +303,16 @@ func (r *Room) showAllResults() {
 	}
 	message := RoomMessage{Command: CmdRoomFinalResult, Content: results}
 	r.broadCast(&message)
+}
+
+func (r *Room) finish() {
+	idList := make([]UserID, 0, len(r.clients))
+	for id := range(r.clients) {
+		idList = append(idList, id)
+	}
+	for _, id := range idList {
+		r.cancelSubscribe(id)
+	}
 }
 
 func (r *Room) close() {
