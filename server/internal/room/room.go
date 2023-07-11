@@ -307,7 +307,7 @@ func (r *Room) showAllResults() {
 
 func (r *Room) finish() {
 	idList := make([]UserID, 0, len(r.clients))
-	for id := range(r.clients) {
+	for id := range r.clients {
 		idList = append(idList, id)
 	}
 	for _, id := range idList {
