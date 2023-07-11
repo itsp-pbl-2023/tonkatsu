@@ -106,7 +106,7 @@ func (r *Room) handleMessagesInWaiting() bool {
 						Content: names,
 					})
 				case CmdClientStartGame:
-					fmt.Printf("A:GameMode%v\n", m.Content)
+					fmt.Printf("A:GameMode:%v\n", m.Content)
 					r.context.GameMode = string(m.Content.(ClientMsgGameMode))
 					return false
 				default:
