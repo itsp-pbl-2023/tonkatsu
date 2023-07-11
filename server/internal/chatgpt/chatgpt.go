@@ -3,6 +3,7 @@ package chatgpt
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -117,6 +118,7 @@ func AskChatGPT(keyword string, gamemode string) []string {
 		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。英語で書いてください。[[KEYWORD]]という言葉は絶対に使わないでください。"
 	}
 	prompt = strings.Replace(prompt, "[[KEYWORD]]", keyword, -1)
+	fmt.Printf("prompt:%v\n", prompt)
 	response := CallChatGPT(prompt)
 
 	response = MaskKeyword(response, keyword)
