@@ -104,6 +104,7 @@ func CallChatGPT(message string) string {
 
 func AskChatGPT(keyword string, gamemode string) []string {
 	var prompt string
+	fmt.Printf("gamemode:%v\n", gamemode)
 	switch gamemode {
 	case "normal":
 		prompt = "[[KEYWORD]]に関する説明を5箇条で書いてください。日本語で書いてください。極めて抽象的に記述してください。[[KEYWORD]]という言葉は絶対に使わないでください。"
