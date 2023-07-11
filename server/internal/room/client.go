@@ -44,7 +44,7 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer func() {
 		client.sender <- &ClientMessage{
-			Command: CmdClientLeaveRoom,
+			Command: CmdClientDisconnect,
 			Content: nil,
 		}
 		client.left.Store(true)
@@ -234,6 +234,14 @@ func (client *client) listenRoom(wg *sync.WaitGroup) {
 					Content: model.SendFinalResults{
 						Result: sendResults,
 					},
+				})
+				if err != nil {
+					return
+				}
+			case CmdRoomDisconnect:
+				err := client.writeJSONWithLog(&model.WSMessageToSend{
+					Command: model.WSCmdSendDisconnect,
+					Content: nil,
 				})
 				if err != nil {
 					return
