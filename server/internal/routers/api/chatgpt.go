@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"tonkatsu-server/internal/chatgpt"
 
@@ -23,7 +22,6 @@ func ChatGPT(ctx *gin.Context) {
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 	}
-	fmt.Printf("request:%v\n", request)
 	response.Messages = chatgpt.AskChatGPT(request.Message, "normal")
 
 	ctx.JSON(http.StatusOK, response)

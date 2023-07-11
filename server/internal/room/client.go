@@ -79,7 +79,6 @@ func (client *client) listenWS(wg *sync.WaitGroup) {
 				Command: CmdClientStartGame,
 				Content: ClientMsgGameMode(content.GameMode),
 			}
-			fmt.Printf("B:Gamemode:%v", content.GameMode)
 		case model.WSCmdQuestionerQuestion:
 			content := message.Content.(model.WSContentQuestionerQuestion)
 			client.sender <- &ClientMessage{
